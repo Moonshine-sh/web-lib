@@ -1,5 +1,6 @@
 package by.ginel.weblib.dao.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.GeneratedValue;
