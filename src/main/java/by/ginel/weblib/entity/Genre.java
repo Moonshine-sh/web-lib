@@ -1,8 +1,8 @@
-package by.ginel.weblib.dao.entity;
+package by.ginel.weblib.entity;
 
 public enum Genre {
-    Detective,
-    Fantasy,
-    Action,
-    Manuals
+    DETECTIVE,
+    FANTASY,
+    ACTION,
+    MANUAL
 }

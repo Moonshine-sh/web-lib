@@ -1,4 +1,4 @@
-package by.ginel.weblib.dao.entity;
+package by.ginel.weblib.entity;
 
 import lombok.*;
 
@@ -18,7 +18,7 @@ public class Book extends AbstractEntity {
     private String author;
     private String description;
     private Double price;
-    private String cover;
+    private String picPath;
     @Enumerated(EnumType.STRING)
     private Genre genre;
 

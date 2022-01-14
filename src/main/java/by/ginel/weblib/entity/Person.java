@@ -1,4 +1,4 @@
-package by.ginel.weblib.dao.entity;
+package by.ginel.weblib.entity;
 
 import lombok.*;
 

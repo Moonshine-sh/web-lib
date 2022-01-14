@@ -1,6 +1,6 @@
-package by.ginel.weblib.dao.entity;
+package by.ginel.weblib.entity;
 
 public enum PersonRole {
-    Admin,
-    User
+    ADMIN,
+    USER
 }
