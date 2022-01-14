@@ -1,7 +1,7 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.OrderBookDao;
-import by.ginel.weblib.dao.entity.OrderBook;
+import by.ginel.weblib.entity.OrderBook;
 import org.springframework.stereotype.Repository;
 
 @Repository

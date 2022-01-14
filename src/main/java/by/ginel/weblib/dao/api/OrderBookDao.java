@@ -1,6 +1,6 @@
 package by.ginel.weblib.dao.api;
 
-import by.ginel.weblib.dao.entity.OrderBook;
+import by.ginel.weblib.entity.OrderBook;
 
 public interface OrderBookDao extends Dao<OrderBook>{
 }

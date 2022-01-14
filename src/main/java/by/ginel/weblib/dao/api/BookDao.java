@@ -1,7 +1,7 @@
 package by.ginel.weblib.dao.api;
 
-import by.ginel.weblib.dao.entity.Book;
-import by.ginel.weblib.dao.entity.Genre;
+import by.ginel.weblib.entity.Book;
+import by.ginel.weblib.entity.Genre;
 
 import java.util.List;
 

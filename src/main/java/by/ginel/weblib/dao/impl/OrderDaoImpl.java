@@ -1,8 +1,8 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.OrderDao;
-import by.ginel.weblib.dao.entity.Order;
-import by.ginel.weblib.dao.entity.OrderStatus;
+import by.ginel.weblib.entity.Order;
+import by.ginel.weblib.entity.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.Dao;
-import by.ginel.weblib.dao.entity.AbstractEntity;
+import by.ginel.weblib.entity.AbstractEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

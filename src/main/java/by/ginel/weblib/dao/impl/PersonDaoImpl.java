@@ -1,14 +1,16 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.PersonDao;
-import by.ginel.weblib.dao.entity.Person;
+import by.ginel.weblib.entity.Person;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -43,12 +45,12 @@ public class PersonDaoImpl extends AbstractDao<Person> implements PersonDao {
     }
 
     @Override
-    public List<Person> findByLogin(String login) {
+    public Person findByLogin(String login) throws NoResultException {
         log.info("Executing method findAllByLogin()");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Person> cq = cb.createQuery(Person.class);
         Root<Person> root = cq.from(Person.class);
         cq.select(root).where(cb.equal(root.get("login"), login));
-        return entityManager.createQuery(cq).getResultList();
+        return entityManager.createQuery(cq).getSingleResult();
     }
 }

@@ -1,8 +1,8 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.BookDao;
-import by.ginel.weblib.dao.entity.Book;
-import by.ginel.weblib.dao.entity.Genre;
+import by.ginel.weblib.entity.Book;
+import by.ginel.weblib.entity.Genre;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
