@@ -1,8 +1,8 @@
 package by.ginel.weblib.service.api;
 
-import by.ginel.weblib.service.dto.AbstractCreateDto;
-import by.ginel.weblib.service.dto.AbstractGetDto;
-import by.ginel.weblib.service.dto.AbstractUpdateDto;
+import by.ginel.weblib.dto.AbstractCreateDto;
+import by.ginel.weblib.dto.AbstractGetDto;
+import by.ginel.weblib.dto.AbstractUpdateDto;
 
 import java.util.List;
 

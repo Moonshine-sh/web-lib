@@ -2,12 +2,12 @@ package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.OrderDao;
 import by.ginel.weblib.dao.api.PersonDao;
-import by.ginel.weblib.dao.entity.Order;
-import by.ginel.weblib.dao.entity.OrderStatus;
+import by.ginel.weblib.entity.Order;
+import by.ginel.weblib.entity.OrderStatus;
 import by.ginel.weblib.service.api.OrderService;
-import by.ginel.weblib.service.dto.OrderCreateDto;
-import by.ginel.weblib.service.dto.OrderGetDto;
-import by.ginel.weblib.service.dto.OrderUpdateDto;
+import by.ginel.weblib.dto.OrderCreateDto;
+import by.ginel.weblib.dto.OrderGetDto;
+import by.ginel.weblib.dto.OrderUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

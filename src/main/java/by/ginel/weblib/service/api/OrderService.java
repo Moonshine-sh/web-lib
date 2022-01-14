@@ -1,9 +1,9 @@
 package by.ginel.weblib.service.api;
 
-import by.ginel.weblib.dao.entity.OrderStatus;
-import by.ginel.weblib.service.dto.OrderCreateDto;
-import by.ginel.weblib.service.dto.OrderGetDto;
-import by.ginel.weblib.service.dto.OrderUpdateDto;
+import by.ginel.weblib.entity.OrderStatus;
+import by.ginel.weblib.dto.OrderCreateDto;
+import by.ginel.weblib.dto.OrderGetDto;
+import by.ginel.weblib.dto.OrderUpdateDto;
 
 import java.util.List;
 

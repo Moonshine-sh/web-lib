@@ -1,15 +1,16 @@
 package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.PersonDao;
-import by.ginel.weblib.dao.entity.Person;
+import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.service.api.PersonService;
-import by.ginel.weblib.service.dto.PersonCreateDto;
-import by.ginel.weblib.service.dto.PersonGetDto;
-import by.ginel.weblib.service.dto.PersonUpdateDto;
+import by.ginel.weblib.dto.PersonCreateDto;
+import by.ginel.weblib.dto.PersonGetDto;
+import by.ginel.weblib.dto.PersonUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -128,21 +129,22 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<PersonGetDto> findByLogin(String login) {
-        List<Person> people = personDao.findByLogin(login);
-        return people
-                .stream()
-                .map(person -> PersonGetDto.builder()
-                        .id(person.getId())
-                        .firstName(person.getFirstName())
-                        .lastName(person.getLastName())
-                        .locked(person.getLocked())
-                        .login(person.getLogin())
-                        .password(person.getPassword())
-                        .email(person.getEmail())
-                        .role(person.getRole().toString())
-                        .build()
-                )
-                .collect(Collectors.toList());
+    public PersonGetDto findByLogin(String login) {
+        try{
+            Person person = personDao.findByLogin(login);
+            return PersonGetDto.builder()
+                    .id(person.getId())
+                    .firstName(person.getFirstName())
+                    .lastName(person.getLastName())
+                    .locked(person.getLocked())
+                    .login(person.getLogin())
+                    .password(person.getPassword())
+                    .email(person.getEmail())
+                    .role(person.getRole().toString())
+                    .build();
+        }catch (NoResultException ex){
+            return null;
+        }
+
     }
 }

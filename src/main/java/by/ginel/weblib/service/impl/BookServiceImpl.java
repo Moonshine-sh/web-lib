@@ -1,12 +1,12 @@
 package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.BookDao;
-import by.ginel.weblib.dao.entity.Book;
-import by.ginel.weblib.dao.entity.Genre;
+import by.ginel.weblib.entity.Book;
+import by.ginel.weblib.entity.Genre;
 import by.ginel.weblib.service.api.BookService;
-import by.ginel.weblib.service.dto.BookCreateDto;
-import by.ginel.weblib.service.dto.BookGetDto;
-import by.ginel.weblib.service.dto.BookUpdateDto;
+import by.ginel.weblib.dto.BookCreateDto;
+import by.ginel.weblib.dto.BookGetDto;
+import by.ginel.weblib.dto.BookUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ public class BookServiceImpl implements BookService {
                         .author(bookCreateDto.getAuthor())
                         .description(bookCreateDto.getDescription())
                         .price(bookCreateDto.getPrice())
-                        .cover(bookCreateDto.getPicPath())
+                        .picPath(bookCreateDto.getPicPath())
                         .genre(bookCreateDto.getGenre())
                         .build()
         );
@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService {
         book.setAuthor(bookUpdateDto.getAuthor());
         book.setDescription(bookUpdateDto.getDescription());
         book.setPrice(bookUpdateDto.getPrice());
-        book.setCover(bookUpdateDto.getPicPath());
+        book.setPicPath(bookUpdateDto.getPicPath());
         book.setGenre(bookUpdateDto.getGenre());
 
         bookDao.update(book);
@@ -64,7 +64,7 @@ public class BookServiceImpl implements BookService {
                 .author(book.getAuthor())
                 .description(book.getDescription())
                 .price(book.getPrice())
-                .picPath(book.getCover())
+                .picPath(book.getPicPath())
                 .genre(book.getGenre().toString())
                 .build();
     }
@@ -80,7 +80,7 @@ public class BookServiceImpl implements BookService {
                         .author(book.getAuthor())
                         .description(book.getDescription())
                         .price(book.getPrice())
-                        .picPath(book.getCover())
+                        .picPath(book.getPicPath())
                         .genre(book.getGenre().toString())
                         .build()
                 )
@@ -98,7 +98,7 @@ public class BookServiceImpl implements BookService {
                         .author(book.getAuthor())
                         .description(book.getDescription())
                         .price(book.getPrice())
-                        .picPath(book.getCover())
+                        .picPath(book.getPicPath())
                         .genre(book.getGenre().toString())
                         .build()
                 )
@@ -116,7 +116,7 @@ public class BookServiceImpl implements BookService {
                         .author(book.getAuthor())
                         .description(book.getDescription())
                         .price(book.getPrice())
-                        .picPath(book.getCover())
+                        .picPath(book.getPicPath())
                         .genre(book.getGenre().toString())
                         .build()
                 )
@@ -134,7 +134,7 @@ public class BookServiceImpl implements BookService {
                         .author(book.getAuthor())
                         .description(book.getDescription())
                         .price(book.getPrice())
-                        .picPath(book.getCover())
+                        .picPath(book.getPicPath())
                         .genre(book.getGenre().toString())
                         .build()
                 )
