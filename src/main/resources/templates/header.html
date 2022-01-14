@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div th:fragment="header" style="display: flex">
+        <div style="text-align: left" th:if="${person} ne null">
+            <div>
+                <a th:href="@{/catalog}">Open catalog</a>
+                <br>
+                <a th:href="@{/cart}">cart</a>
+            </div>
+        </div>
+        <div style="text-align: right" >
+            <div th:if="${person} ne null">
+                <p th:text="'hello, '+${person.getFirstName()}"></p>
+                <a th:href="@{/logout}">logout</a>
+            </div>
+            <div th:unless="${person} ne null">
+                <a th:href="@{/login}">login</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
