@@ -1,6 +1,6 @@
-package by.ginel.weblib.service.dto;
+package by.ginel.weblib.dto;
 
-import by.ginel.weblib.dao.entity.OrderStatus;
+import by.ginel.weblib.entity.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,4 +1,4 @@
-package by.ginel.weblib.service.dto;
+package by.ginel.weblib.dto;
 
 public abstract class AbstractCreateDto {
 }

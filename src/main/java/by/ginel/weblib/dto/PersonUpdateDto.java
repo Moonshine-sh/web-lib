@@ -1,6 +1,6 @@
-package by.ginel.weblib.service.dto;
+package by.ginel.weblib.dto;
 
-import by.ginel.weblib.dao.entity.PersonRole;
+import by.ginel.weblib.entity.PersonRole;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

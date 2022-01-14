@@ -1,4 +1,4 @@
-package by.ginel.weblib.service.dto;
+package by.ginel.weblib.dto;
 
 import lombok.Builder;
 import lombok.Data;
