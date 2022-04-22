@@ -15,7 +15,7 @@
                 <a th:href="@{/orders}">Orders</a>
             </div>
         </div>
-        <div style="text-align: right" >
+        <div style="justify-content: space-between" >
             <div th:if="${person} ne null">
                 <p th:text="'hello, '+${person.getFirstName()}"></p>
                 <a th:href="@{/logout}">logout</a>
