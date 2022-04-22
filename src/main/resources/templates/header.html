@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    <div th:fragment="header" style="display: flex">
+    <div th:fragment="header" style="display: flex; justify-content: space-between;">
         <div style="text-align: left" th:if="${person} ne null">
             <div>
                 <a th:href="@{/catalog}">Open catalog</a>
@@ -15,7 +15,7 @@
                 <a th:href="@{/orders}">Orders</a>
             </div>
         </div>
-        <div style="justify-content: space-between" >
+        <div style="text-align: right" >
             <div th:if="${person} ne null">
                 <p th:text="'hello, '+${person.getFirstName()}"></p>
                 <a th:href="@{/logout}">logout</a>
