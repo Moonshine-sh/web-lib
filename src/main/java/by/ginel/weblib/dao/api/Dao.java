@@ -1,12 +1,12 @@
 package by.ginel.weblib.dao.api;
 
-import by.ginel.weblib.dao.entity.AbstractEntity;
+import by.ginel.weblib.entity.AbstractEntity;
 
 import java.util.List;
 
 public interface Dao<T extends AbstractEntity> {
 
-    void save(T entity);
+    T save(T entity);
 
     void delete(Long id);
 

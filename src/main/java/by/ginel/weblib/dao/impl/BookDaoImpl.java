@@ -1,8 +1,8 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.BookDao;
-import by.ginel.weblib.dao.entity.Book;
-import by.ginel.weblib.dao.entity.Genre;
+import by.ginel.weblib.entity.Book;
+import by.ginel.weblib.entity.Genre;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -53,7 +53,7 @@ public class BookDaoImpl extends AbstractDao<Book> implements BookDao {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> cq = cb.createQuery(Book.class);
         Root<Book> root = cq.from(Book.class);
-        cq.select(root).where(cb.equal(root.get("genre"), genre.ordinal()));
+        cq.select(root).where(cb.equal(root.get("genre"), genre));
         return entityManager.createQuery(cq).getResultList();
     }
 }

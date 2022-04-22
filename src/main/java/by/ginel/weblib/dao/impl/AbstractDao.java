@@ -1,7 +1,7 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.Dao;
-import by.ginel.weblib.dao.entity.AbstractEntity;
+import by.ginel.weblib.entity.AbstractEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +24,11 @@ public abstract class AbstractDao<T extends AbstractEntity> implements Dao<T> {
 
     @Transactional
     @Override
-    public void save(T entity) {
+    public T save(T entity) {
         log.info("Executing method save()");
         log.debug("Executing method save() for the entity: {}" ,entity);
         entityManager.persist(entity);
+        return entity;
     }
 
     @Transactional
