@@ -12,17 +12,17 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "order")
+@Table(name = "user_order")
 public class Order extends AbstractEntity{
 
-    private Date date;
+    private String date;
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatus orderStatus;
 
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     private List<OrderBook> books;
 }

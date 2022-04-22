@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface Dao<T extends AbstractEntity> {
 
-    void save(T entity);
+    T save(T entity);
 
     void delete(Long id);
 

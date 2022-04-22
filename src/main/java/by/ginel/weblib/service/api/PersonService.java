@@ -11,4 +11,5 @@ public interface PersonService extends Service<PersonCreateDto, PersonUpdateDto,
     List<PersonGetDto> findAllByName(String name);
     List<PersonGetDto> findAllLocked();
     PersonGetDto findByLogin(String login);
+    void updateLocked(Long id);
 }

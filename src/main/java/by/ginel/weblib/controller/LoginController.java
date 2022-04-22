@@ -1,38 +1,34 @@
 package by.ginel.weblib.controller;
 
-import by.ginel.weblib.dao.api.PersonDao;
+import by.ginel.weblib.dto.PersonCreateDto;
 import by.ginel.weblib.dto.PersonGetDto;
-import by.ginel.weblib.entity.Person;
+import by.ginel.weblib.entity.PersonRole;
+import by.ginel.weblib.service.api.OrderService;
 import by.ginel.weblib.service.api.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.net.http.HttpResponse;
-import java.util.Date;
-import java.util.List;
 
 @RestController
-@RequestMapping(value = "/login")
+@RequestMapping
 public class LoginController {
 
     @Autowired
     PersonService personService;
 
-    @GetMapping()
+    @Autowired
+    OrderService orderService;
+
+    @GetMapping("/login")
     public ModelAndView getLogin(ModelAndView modelAndView){
 
         modelAndView.setViewName("login");
         return modelAndView;
     }
 
-    @PostMapping()
+    @PostMapping("/login")
     public ModelAndView postLogin(@RequestParam("username") String login, @RequestParam("pass") String password, HttpServletRequest request){
 
         PersonGetDto person = personService.findByLogin(login);
@@ -43,6 +39,26 @@ public class LoginController {
             return new ModelAndView("redirect:/home");
         }else{
             return new ModelAndView("login").addObject("error","Incorrect login or password");
+        }
+    }
+
+    @GetMapping("/register")
+    public ModelAndView getRegister(ModelAndView modelAndView){
+
+        modelAndView.setViewName("register");
+        return modelAndView;
+    }
+
+    @PostMapping("/register")
+    public ModelAndView postRegister(@ModelAttribute PersonCreateDto person){
+        PersonGetDto personFromDB = personService.findByLogin(person.getLogin());
+        if(personFromDB == null){
+            person.setLocked(false);
+            person.setRole(PersonRole.USER.toString());
+            personService.save(person);
+            return new ModelAndView("login").addObject("error","User created successfully");
+        }else{
+            return new ModelAndView("register").addObject("error","User with such username already exist!");
         }
     }
 }

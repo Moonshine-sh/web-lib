@@ -53,7 +53,7 @@ public class BookDaoImpl extends AbstractDao<Book> implements BookDao {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> cq = cb.createQuery(Book.class);
         Root<Book> root = cq.from(Book.class);
-        cq.select(root).where(cb.equal(root.get("genre"), genre.ordinal()));
+        cq.select(root).where(cb.equal(root.get("genre"), genre));
         return entityManager.createQuery(cq).getResultList();
     }
 }

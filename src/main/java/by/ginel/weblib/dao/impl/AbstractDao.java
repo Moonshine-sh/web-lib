@@ -24,10 +24,11 @@ public abstract class AbstractDao<T extends AbstractEntity> implements Dao<T> {
 
     @Transactional
     @Override
-    public void save(T entity) {
+    public T save(T entity) {
         log.info("Executing method save()");
         log.debug("Executing method save() for the entity: {}" ,entity);
         entityManager.persist(entity);
+        return entity;
     }
 
     @Transactional

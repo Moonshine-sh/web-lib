@@ -7,7 +7,7 @@ import by.ginel.weblib.dto.AbstractUpdateDto;
 import java.util.List;
 
 public interface Service <C extends AbstractCreateDto, U extends AbstractUpdateDto, G extends AbstractGetDto> {
-    void save(C createDto);
+    G save(C createDto);
     void delete(Long id);
     void update(U updateDto);
     G getById(Long id);

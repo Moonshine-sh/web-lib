@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface OrderService extends Service<OrderCreateDto, OrderUpdateDto, OrderGetDto>{
 
-    List<OrderGetDto> findAllByStatus(OrderStatus status);
+    List<OrderGetDto> getAllByPersonId(Long id);
+    void updateStatus(OrderUpdateDto newOrder);
 }

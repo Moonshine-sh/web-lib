@@ -4,17 +4,21 @@ import by.ginel.weblib.dao.api.OrderDao;
 import by.ginel.weblib.dao.api.PersonDao;
 import by.ginel.weblib.entity.Order;
 import by.ginel.weblib.entity.OrderStatus;
+import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.service.api.OrderService;
 import by.ginel.weblib.dto.OrderCreateDto;
 import by.ginel.weblib.dto.OrderGetDto;
 import by.ginel.weblib.dto.OrderUpdateDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -26,14 +30,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public void save(OrderCreateDto orderCreateDto) {
-        orderDao.save(
+    public OrderGetDto save(OrderCreateDto orderCreateDto) {
+        Order order = orderDao.save(
                 Order.builder()
                         .date(orderCreateDto.getDate())
                         .person(personDao.getById(orderCreateDto.getPersonId()))
-                        .status(orderCreateDto.getStatus())
+                        .orderStatus(orderCreateDto.getStatus())
                         .build()
         );
+        return OrderGetDto.builder()
+                .id(order.getId())
+                .date(order.getDate())
+                .personId(order.getPerson().getId())
+                .status(order.getOrderStatus().toString())
+                .build();
     }
 
     @Transactional
@@ -49,19 +59,19 @@ public class OrderServiceImpl implements OrderService {
         order.setId(orderUpdateDto.getId());
         order.setDate(orderUpdateDto.getDate());
         order.setPerson(personDao.getById(orderUpdateDto.getPersonId()));
-        order.setStatus(orderUpdateDto.getStatus());
+        order.setOrderStatus(orderUpdateDto.getStatus());
 
         orderDao.update(order);
     }
 
     @Override
-    public OrderGetDto getById(Long id) {
+    public OrderGetDto getById(Long id) throws NullPointerException{
         Order order = orderDao.getById(id);
         return  OrderGetDto.builder()
                 .id(order.getId())
-                .date(order.getDate().toString())
+                .date(order.getDate())
                 .personId(order.getPerson().getId())
-                .status(order.getStatus().toString())
+                .status(order.getOrderStatus().toString())
                 .build();
     }
 
@@ -72,26 +82,36 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(order ->OrderGetDto.builder()
                         .id(order.getId())
-                        .date(order.getDate().toString())
+                        .date(order.getDate())
                         .personId(order.getPerson().getId())
-                        .status(order.getStatus().toString())
+                        .status(order.getOrderStatus().toString())
                         .build()
                 )
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<OrderGetDto> findAllByStatus(OrderStatus status) {
-        List<Order> orders = orderDao.findAllByStatus(status);
+    public List<OrderGetDto> getAllByPersonId(Long id) {
+        log.info("Executing method getAllByPersonId()");
+        List<Order> orders = orderDao.getAll();
         return orders
                 .stream()
+                .filter(order -> order.getPerson().getId() == id)
                 .map(order ->OrderGetDto.builder()
                         .id(order.getId())
-                        .date(order.getDate().toString())
+                        .date(order.getDate())
                         .personId(order.getPerson().getId())
-                        .status(order.getStatus().toString())
+                        .status(order.getOrderStatus().toString())
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(OrderUpdateDto newOrder) throws NullPointerException {
+        log.info("Executing method updateStatus()");
+        Order order = orderDao.getById(newOrder.getId());
+        order.setOrderStatus(newOrder.getStatus());
     }
 }
