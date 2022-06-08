@@ -3,8 +3,6 @@ package by.ginel.weblib.service.impl;
 import by.ginel.weblib.dao.api.OrderDao;
 import by.ginel.weblib.dao.api.PersonDao;
 import by.ginel.weblib.entity.Order;
-import by.ginel.weblib.entity.OrderStatus;
-import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.service.api.OrderService;
 import by.ginel.weblib.dto.OrderCreateDto;
 import by.ginel.weblib.dto.OrderGetDto;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderDao.save(
                 Order.builder()
                         .date(orderCreateDto.getDate())
+                        .price(orderCreateDto.getPrice())
                         .person(personDao.getById(orderCreateDto.getPersonId()))
                         .orderStatus(orderCreateDto.getStatus())
                         .build()
@@ -41,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderGetDto.builder()
                 .id(order.getId())
                 .date(order.getDate())
+                .price(order.getPrice())
                 .personId(order.getPerson().getId())
                 .status(order.getOrderStatus().toString())
                 .build();
@@ -58,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setId(orderUpdateDto.getId());
         order.setDate(orderUpdateDto.getDate());
+        order.setPrice(orderUpdateDto.getPrice());
         order.setPerson(personDao.getById(orderUpdateDto.getPersonId()));
         order.setOrderStatus(orderUpdateDto.getStatus());
 
@@ -70,6 +70,7 @@ public class OrderServiceImpl implements OrderService {
         return  OrderGetDto.builder()
                 .id(order.getId())
                 .date(order.getDate())
+                .price(order.getPrice())
                 .personId(order.getPerson().getId())
                 .status(order.getOrderStatus().toString())
                 .build();
@@ -83,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(order ->OrderGetDto.builder()
                         .id(order.getId())
                         .date(order.getDate())
+                        .price(order.getPrice())
                         .personId(order.getPerson().getId())
                         .status(order.getOrderStatus().toString())
                         .build()
@@ -96,10 +98,11 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderDao.getAll();
         return orders
                 .stream()
-                .filter(order -> order.getPerson().getId() == id)
+                .filter(order -> order.getPerson().getId().equals(id))
                 .map(order ->OrderGetDto.builder()
                         .id(order.getId())
                         .date(order.getDate())
+                        .price(order.getPrice())
                         .personId(order.getPerson().getId())
                         .status(order.getOrderStatus().toString())
                         .build()

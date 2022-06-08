@@ -8,27 +8,24 @@ import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.BookService;
 import by.ginel.weblib.service.api.OrderBookService;
 import by.ginel.weblib.service.api.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    BookService bookService;
-
-    @Autowired
-    OrderService orderService;
-
-    @Autowired
-    OrderBookService orderBookService;
+    private final BookService bookService;
+    private final OrderService orderService;
+    private final OrderBookService orderBookService;
 
     @GetMapping("/order")
     public ModelAndView placeOrder(HttpServletRequest request){
@@ -44,6 +41,7 @@ public class OrderController {
 
             OrderCreateDto order = OrderCreateDto.builder()
                     .personId(person.getId())
+                    .date(new Date().toString())
                     .status(OrderStatus.BOOKED.toString())
                     .build();
             OrderGetDto newOrder = orderService.save(order);
@@ -57,6 +55,20 @@ public class OrderController {
                     )
                     .collect(Collectors.toList())
                     .forEach(orderBook -> orderBookService.save(orderBook));
+
+            Long orderPrice = cart.stream().mapToLong(
+                    item -> (long) (item.getQuantity() * bookService.getById(item.getBookId()).getPrice())
+                    ).sum();
+            newOrder.setPrice(orderPrice);
+
+            orderService.update(
+                    OrderUpdateDto.builder()
+                    .id(newOrder.getId())
+                    .date(newOrder.getDate())
+                    .personId(newOrder.getPersonId())
+                    .status(newOrder.getStatus())
+                    .price(newOrder.getPrice()).build()
+            );
 
             return new ModelAndView("redirect:/home");
         }
@@ -92,7 +104,7 @@ public class OrderController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null && person.getRole() == PersonRole.ADMIN.toString()){
+        if(person != null && person.getRole().equals(PersonRole.ADMIN.toString())){
             List<OrderGetDto> orders = orderService.getAll();
             if (orders == null || orders.size()==0){
                 session.setAttribute("error","There are no active orders");
@@ -114,8 +126,8 @@ public class OrderController {
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
         if(person != null){
 
-            List<OrderGetDto> orders = new ArrayList<>();
-            if(person.getRole() == PersonRole.ADMIN.toString()) {
+            List<OrderGetDto> orders;
+            if(person.getRole().equals(PersonRole.ADMIN.toString())) {
                 orders = orderService.getAll();
             }
             else{
@@ -127,7 +139,7 @@ public class OrderController {
             }
 
             for (OrderGetDto order:orders) {
-                if (order.getId()==id){
+                if (order.getId().equals(id)){
                     List<BookGetDto> books = orderBookService.getAllByOrderId(id).stream()
                             .map(item -> bookService.getById(item.getBookId()))
                             .collect(Collectors.toList());
@@ -158,7 +170,7 @@ public class OrderController {
             }
 
             for (OrderGetDto order:orders) {
-                if (order.getId()==id && order.getStatus() == "BOOKED"){
+                if (order.getId().equals(id) && order.getStatus().equals("BOOKED")){
                     orderService.delete(id);
                     return new ModelAndView("redirect:/orders");
                 }
@@ -177,12 +189,14 @@ public class OrderController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null && person.getRole() == PersonRole.ADMIN.toString()){
+        if(person != null && person.getRole().equals(PersonRole.ADMIN.toString())){
 
             try {
 
                 OrderGetDto order = orderService.getById(id);
+                OrderStatus[] orderStatuses = OrderStatus.class.getEnumConstants();
                 return new ModelAndView("edit_order")
+                        .addObject("statuses",orderStatuses)
                         .addObject("order",order)
                         .addObject("person",request.getSession().getAttribute("person"));
             } catch (NullPointerException e) {
@@ -201,7 +215,7 @@ public class OrderController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
             orderService.updateStatus(order);
             return new ModelAndView("redirect:/orderslist");

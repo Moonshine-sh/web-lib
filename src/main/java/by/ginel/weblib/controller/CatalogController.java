@@ -2,6 +2,7 @@ package by.ginel.weblib.controller;
 
 import by.ginel.weblib.dto.BookGetDto;
 import by.ginel.weblib.service.api.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,19 +13,20 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class CatalogController {
 
-    @Autowired
-    BookService bookService;
+    private final BookService bookService;
 
     @GetMapping("/catalog")
-    public ModelAndView getCatalog(HttpServletRequest request){
+    public ModelAndView getCatalog(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
-        ModelAndView modelAndView = new ModelAndView("catalog");
+        ModelAndView modelAndView = new ModelAndView();
         List<BookGetDto> books = bookService.getAll();
-        modelAndView.addObject("person",session.getAttribute("person"));
-        modelAndView.addObject("books",books);
+        modelAndView.addObject("person", session.getAttribute("person"))
+                .addObject("books", books)
+                .setViewName("catalog");
         return modelAndView;
     }
 }

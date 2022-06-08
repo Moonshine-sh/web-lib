@@ -98,7 +98,7 @@ public class OrderBookServiceImpl implements OrderBookService {
         List<OrderBook> orderBooks = orderBookDao.getAll();
         return orderBooks
                 .stream()
-                .filter(orderBook -> orderBook.getOrder().getId() == id)
+                .filter(orderBook -> orderBook.getOrder().getId().equals(id))
                 .map(orderBook ->OrderBookGetDto.builder()
                         .id(orderBook.getId())
                         .quantity(orderBook.getQuantity())

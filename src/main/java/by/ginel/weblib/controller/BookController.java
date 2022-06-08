@@ -7,6 +7,7 @@ import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.CartBook;
 import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -22,36 +23,38 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/book")
+@RequiredArgsConstructor
 public class BookController {
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    @Autowired
-    BookService bookService;
+    private final BookService bookService;
 
     @GetMapping("/{id}")
     public ModelAndView getBook(HttpServletRequest request, @PathVariable Long id) {
 
+        ModelAndView modelAndView = new ModelAndView();
         try {
             BookGetDto book = bookService.getById(id);
-            return new ModelAndView("book").addObject("book", book)
-                    .addObject("person",request.getSession().getAttribute("person"));
-        }catch (NullPointerException ex){
+            modelAndView.addObject("book", book)
+                    .addObject("person", request.getSession().getAttribute("person"))
+                    .setViewName("book");
+            return modelAndView;
+        } catch (NullPointerException ex) {
             request.getSession().setAttribute("error", "there is no book with such id");
-            return new ModelAndView("redirect:/error");
+            modelAndView.setViewName("redirect:/error");
+            return modelAndView;
         }
     }
 
     @GetMapping("/{id}/add")
-    public ModelAndView addBookToCart(@PathVariable Long id, @RequestParam("quantity") Long quantity, HttpServletRequest request){
+    public ModelAndView addBookToCart(@PathVariable Long id, @RequestParam("quantity") Long quantity, HttpServletRequest request) {
 
-        List<CartBook> cart = (List<CartBook>) request.getSession().getAttribute("cart");
-        if(cart == null)
-            cart = new ArrayList<>();
-        cart.add(new CartBook(id,quantity));
-        request.getSession().setAttribute("cart",cart);
-        return new ModelAndView("redirect:/catalog");
+        ModelAndView modelAndView = new ModelAndView();
+        bookService.addBookToCart(id, quantity, request);
+        modelAndView.setViewName("redirect:/catalog");
+        return modelAndView;
     }
 
     @GetMapping("/{id}/delete")
@@ -59,20 +62,22 @@ public class BookController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
             try {
-                BookGetDto book = bookService.getById(id);
                 bookService.delete(id);
-
-                return new ModelAndView("redirect:/catalog");
+                modelAndView.setViewName("redirect:/catalog");
+                return modelAndView;
             } catch (NullPointerException e) {
                 session.setAttribute("error", "There is no book with such id");
-                return new ModelAndView("redirect:/mistake");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
         } else {
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 
@@ -81,41 +86,43 @@ public class BookController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
-
-            String resultFilename = bookService.filePathCreate(cover);
             try {
-                cover.transferTo(new File(uploadPath+"/"+resultFilename));
+                bookService.saveBookWithCover(book, cover);
             } catch (IOException exception) {
                 session.setAttribute("error", "Something went wrong during file transfer");
-                return new ModelAndView("redirect:/mistake");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
-
-            book.setPicPath(resultFilename);
-            bookService.save(book);
-            return new ModelAndView("redirect:/catalog");
+            modelAndView.setViewName("redirect:/catalog");
+            return modelAndView;
         } else {
 
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
+
 
     @GetMapping("/new")
     public ModelAndView getNewBook(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
-
-            return new ModelAndView("new_book")
-                    .addObject("person",request.getSession().getAttribute("person"));
+            modelAndView.addObject("person", request.getSession().getAttribute("person"))
+                    .setViewName("new_book");
+            return modelAndView;
         } else {
 
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 
@@ -124,22 +131,25 @@ public class BookController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
             try {
 
                 BookGetDto book = bookService.getById(id);
-                return new ModelAndView("edit_book")
-                        .addObject("book",book)
-                        .addObject("person",request.getSession().getAttribute("person"));
+                modelAndView.addObject("book", book)
+                        .addObject("person", request.getSession().getAttribute("person"))
+                        .setViewName("edit_book");
+                return modelAndView;
             } catch (NullPointerException e) {
                 session.setAttribute("error", "There is no book with such id");
-                return new ModelAndView("redirect:/mistake");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
         } else {
 
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 
@@ -148,24 +158,25 @@ public class BookController {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
-        if (person != null && person.getRole() == PersonRole.ADMIN.toString()) {
-
-            String resultFilename = bookService.filePathCreate(cover);
             try {
-                cover.transferTo(new File(uploadPath+"/"+resultFilename));
+                bookService.updateBookWithCover(book, cover);
             } catch (IOException exception) {
                 session.setAttribute("error", "Something went wrong during file transfer");
-                return new ModelAndView("redirect:/mistake");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
 
-            book.setPicPath(resultFilename);
-            bookService.update(book);
-            return new ModelAndView("redirect:/catalog");
-        } else {
+            modelAndView.setViewName("redirect:/catalog");
+            return modelAndView;
+        }
+        else {
 
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 }

@@ -6,6 +6,7 @@ import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.dto.PersonUpdateDto;
 import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.PersonService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,56 +18,67 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class AdminController {
 
-    @Autowired
-    PersonService personService;
+
+    private final PersonService personService;
 
     @GetMapping("/users")
-    public ModelAndView getUserList(HttpServletRequest request){
+    public ModelAndView getUserList(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null  && person.getRole() == PersonRole.ADMIN.toString()){
-            List<PersonGetDto> users = personService.getAll();
-            if (users == null || users.size()==0){
-                session.setAttribute("error","you dont have active users");
-                return new ModelAndView("redirect:/mistake");
+        ModelAndView modelAndView = new ModelAndView();
+
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
+
+            if (personService.isUsersEmpty()) {
+                session.setAttribute("error", "you dont have active users");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
-            return new ModelAndView("users")
-                    .addObject("users",users)
-                    .addObject("person",session.getAttribute("person"));
-        }
-        else{
+            List<PersonGetDto> users = personService.getAll();
+            modelAndView.addObject("users", users)
+                    .addObject("person", session.getAttribute("person"))
+                    .setViewName("users");
+            return modelAndView;
+
+        } else {
+
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 
     @GetMapping("/user/{id}/lock")
-    public ModelAndView lock(@PathVariable Long id, HttpServletRequest request){
+    public ModelAndView lock(@PathVariable Long id, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null  && person.getRole() == PersonRole.ADMIN.toString()){
+        ModelAndView modelAndView = new ModelAndView();
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
             try {
-                PersonGetDto user = personService.getById(id);
-                if (user.getRole() == PersonRole.ADMIN.toString()){
-                    session.setAttribute("error","User is admin");
-                    return new ModelAndView("redirect:/mistake");
+                if (personService.isAdmin(id)) {
+                    session.setAttribute("error", "User is admin");
+                    modelAndView.setViewName("redirect:/mistake");
+                    return modelAndView;
                 }
-                personService.updateLocked(id);
 
-                return new ModelAndView("redirect:/users");
-            }catch (NullPointerException e){
-                session.setAttribute("error","There is no user with such id");
-                return new ModelAndView("redirect:/mistake");
+                personService.updateLocked(id);
+                modelAndView.setViewName("redirect:/users");
+                return modelAndView;
+            } catch (NullPointerException e) {
+                session.setAttribute("error", "There is no user with such id");
+                modelAndView.setViewName("redirect:/mistake");
+                return modelAndView;
             }
-        }
-        else{
+        } else {
             session.setAttribute("error", "You cant access this feature");
-            return new ModelAndView("redirect:/mistake");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
     }
 }

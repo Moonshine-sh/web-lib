@@ -17,6 +17,7 @@ public class OrderUpdateDto extends AbstractUpdateDto {
 
     private Long id;
     private String date;
+    private Long price;
     private Long personId;
     private String status;
 

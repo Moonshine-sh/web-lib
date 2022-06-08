@@ -2,6 +2,7 @@ package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.PersonDao;
 import by.ginel.weblib.entity.Person;
+import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.PersonService;
 import by.ginel.weblib.dto.PersonCreateDto;
 import by.ginel.weblib.dto.PersonGetDto;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +54,8 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional
     @Override
-    public void delete(Long id) { personDao.delete(id);
+    public void delete(Long id) {
+        personDao.delete(id);
     }
 
     @Transactional
@@ -72,7 +76,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonGetDto getById(Long id) {
         Person person = personDao.getById(id);
-        return  PersonGetDto.builder()
+        return PersonGetDto.builder()
                 .id(person.getId())
                 .firstName(person.getFirstName())
                 .lastName(person.getLastName())
@@ -146,7 +150,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonGetDto findByLogin(String login) {
         log.info("Executing method findByLogin()");
-        try{
+        try {
             Person person = personDao.findByLogin(login);
             return PersonGetDto.builder()
                     .id(person.getId())
@@ -158,16 +162,53 @@ public class PersonServiceImpl implements PersonService {
                     .email(person.getEmail())
                     .role(person.getRole().toString())
                     .build();
-        }catch (NoResultException ex){
+        } catch (NoResultException ex) {
             return null;
         }
     }
 
     @Override
     @Transactional
-    public void updateLocked(Long id) throws NullPointerException{
+    public void updateLocked(Long id) throws NullPointerException {
         log.info("Executing method updateLocked()");
         Person person = personDao.getById(id);
-        person.setLocked(!person.getLocked().booleanValue());
+        person.setLocked(!person.getLocked());
+    }
+
+    @Override
+    public boolean isUsersEmpty() {
+        List<Person> users = personDao.getAll();
+        return users == null || users.size() == 0;
+    }
+
+    @Override
+    public boolean isAdmin(Long id) {
+        Person user = personDao.getById(id);
+        return user.getRole() == PersonRole.ADMIN;
+    }
+
+    @Override
+    public boolean isValidCred(String login, String password, HttpServletRequest request) {
+        PersonGetDto person = findByLogin(login);
+        if (person != null && person.getPassword().equals(password)) {
+            HttpSession session = request.getSession();
+            session.setMaxInactiveInterval(3600);
+            session.setAttribute("person", person);
+            return true;
+        } else
+            return false;
+
+    }
+
+    @Override
+    public boolean isUserValid(PersonCreateDto person) {
+        PersonGetDto personFromDB = findByLogin(person.getLogin());
+        if (personFromDB == null) {
+            person.setLocked(false);
+            person.setRole(PersonRole.USER.toString());
+            save(person);
+            return true;
+        } else
+            return false;
     }
 }

@@ -16,6 +16,7 @@ import java.util.TimeZone;
 public class OrderCreateDto extends AbstractCreateDto{
 
     private String date;
+    private Long price;
     private Long personId;
     private String status;
 
