@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class PersonUpdateDto extends AbstractUpdateDto{
+public class PersonUpdateDto extends AbstractUpdateDto {
 
     private Long id;
     private String firstName;

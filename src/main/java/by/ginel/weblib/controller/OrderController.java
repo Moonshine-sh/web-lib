@@ -14,204 +14,158 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final BookService bookService;
     private final OrderService orderService;
-    private final OrderBookService orderBookService;
 
     @GetMapping("/order")
-    public ModelAndView placeOrder(HttpServletRequest request){
+    public ModelAndView placeOrder(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null){
+        if (person != null) {
             List<CartBook> cart = (List<CartBook>) session.getAttribute("cart");
-            if (cart == null || cart.size()==0){
-                session.setAttribute("error","Cart is empty please go to catalog");
+            if (cart == null || cart.size() == 0) {
+                session.setAttribute("error", "Cart is empty please go to catalog");
                 return new ModelAndView("redirect:/mistake");
             }
 
-            OrderCreateDto order = OrderCreateDto.builder()
-                    .personId(person.getId())
-                    .date(new Date().toString())
-                    .status(OrderStatus.BOOKED.toString())
-                    .build();
-            OrderGetDto newOrder = orderService.save(order);
-
-            cart.stream()
-                    .map(item -> OrderBookCreateDto.builder()
-                        .orderId(newOrder.getId())
-                        .quantity(item.getQuantity())
-                        .bookId(item.getBookId())
-                        .build()
-                    )
-                    .collect(Collectors.toList())
-                    .forEach(orderBook -> orderBookService.save(orderBook));
-
-            Long orderPrice = cart.stream().mapToLong(
-                    item -> (long) (item.getQuantity() * bookService.getById(item.getBookId()).getPrice())
-                    ).sum();
-            newOrder.setPrice(orderPrice);
-
-            orderService.update(
-                    OrderUpdateDto.builder()
-                    .id(newOrder.getId())
-                    .date(newOrder.getDate())
-                    .personId(newOrder.getPersonId())
-                    .status(newOrder.getStatus())
-                    .price(newOrder.getPrice()).build()
-            );
+            orderService.placeOrder(person, cart);
 
             return new ModelAndView("redirect:/home");
-        }
-        else{
+        } else {
             session.setAttribute("error", "Please login before accessing this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
 
     @GetMapping("/orders")
-    public ModelAndView getOrders(HttpServletRequest request){
+    public ModelAndView getOrders(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null){
+        if (person != null) {
             List<OrderGetDto> orders = orderService.getAllByPersonId(person.getId());
-            if (orders == null || orders.size()==0){
-                session.setAttribute("error","you dont have active orders");
+            if (orders == null || orders.size() == 0) {
+                session.setAttribute("error", "you dont have active orders");
                 return new ModelAndView("redirect:/mistake");
             }
             return new ModelAndView("orders")
-                    .addObject("orders",orders)
-                    .addObject("person",session.getAttribute("person"));
-        }
-        else{
+                    .addObject("orders", orders)
+                    .addObject("person", session.getAttribute("person"));
+        } else {
             session.setAttribute("error", "Please login before accessing this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
 
     @GetMapping("/orderslist")
-    public ModelAndView getOrdersList(HttpServletRequest request){
+    public ModelAndView getOrdersList(HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null && person.getRole().equals(PersonRole.ADMIN.toString())){
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
             List<OrderGetDto> orders = orderService.getAll();
-            if (orders == null || orders.size()==0){
-                session.setAttribute("error","There are no active orders");
+            if (orders == null || orders.size() == 0) {
+                session.setAttribute("error", "There are no active orders");
                 return new ModelAndView("redirect:/mistake");
             }
             return new ModelAndView("orders_list")
-                    .addObject("orders",orders)
-                    .addObject("person",session.getAttribute("person"));
-        }
-        else{
+                    .addObject("orders", orders)
+                    .addObject("person", session.getAttribute("person"));
+        } else {
             session.setAttribute("error", "You cant access this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
 
     @GetMapping("/order/{id}")
-    public ModelAndView detailOrder(@PathVariable Long id, HttpServletRequest request){
+    public ModelAndView detailOrder(@PathVariable Long id, HttpServletRequest request) {
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null){
+        if (person != null) {
 
-            List<OrderGetDto> orders;
-            if(person.getRole().equals(PersonRole.ADMIN.toString())) {
-                orders = orderService.getAll();
-            }
-            else{
-                orders = orderService.getAllByPersonId(person.getId());
-            }
-            if (orders == null || orders.size()==0){
-                session.setAttribute("error","you dont have active orders");
+            List<OrderGetDto> orders = orderService.getAllByUser(person);
+            if (orders == null || orders.size() == 0) {
+                session.setAttribute("error", "you dont have active orders");
                 return new ModelAndView("redirect:/mistake");
             }
 
-            for (OrderGetDto order:orders) {
-                if (order.getId().equals(id)){
-                    List<BookGetDto> books = orderBookService.getAllByOrderId(id).stream()
-                            .map(item -> bookService.getById(item.getBookId()))
-                            .collect(Collectors.toList());
-                    return new ModelAndView("order")
-                            .addObject("books",books)
-                            .addObject("person",session.getAttribute("person"));
-                }
+            List<BookGetDto> books = orderService.getBooksFromOrder(id, orders);
+            if (Objects.nonNull(books))
+                return new ModelAndView("order")
+                        .addObject("books", books)
+                        .addObject("person", session.getAttribute("person"));
+            else {
+                session.setAttribute("error", "there is no order with such id");
+                return new ModelAndView("redirect:/mistake");
             }
-            session.setAttribute("error", "there is no order with such id");
-            return new ModelAndView("redirect:/mistake");
-        }
-        else{
+        } else {
             session.setAttribute("error", "Please login before accessing this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
+
 
     @GetMapping("/order/{id}/remove")
-    public ModelAndView removeOrder(@PathVariable Long id, HttpServletRequest request){
+    public ModelAndView removeOrder(@PathVariable Long id, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null){
+        if (person != null) {
             List<OrderGetDto> orders = orderService.getAllByPersonId(person.getId());
-            if (orders == null || orders.size()==0){
-                session.setAttribute("error","you dont have active orders");
+            if (orders == null || orders.size() == 0) {
+                session.setAttribute("error", "you dont have active orders");
+                return new ModelAndView("redirect:/mistake");
+            }
+            if (orderService.removeOrder(id, orders))
+                return new ModelAndView("redirect:/orders");
+            else {
+                session.setAttribute("error", "there is no order with such id");
                 return new ModelAndView("redirect:/mistake");
             }
 
-            for (OrderGetDto order:orders) {
-                if (order.getId().equals(id) && order.getStatus().equals("BOOKED")){
-                    orderService.delete(id);
-                    return new ModelAndView("redirect:/orders");
-                }
-            }
-            session.setAttribute("error", "there is no order with such id");
-            return new ModelAndView("redirect:/mistake");
-        }
-        else{
+        } else {
             session.setAttribute("error", "Please login before accessing this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
 
+
     @GetMapping("/order/{id}/edit")
-    public ModelAndView editOrder(@PathVariable Long id, HttpServletRequest request){
+    public ModelAndView editOrder(@PathVariable Long id, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
-        if(person != null && person.getRole().equals(PersonRole.ADMIN.toString())){
+        if (person != null && person.getRole().equals(PersonRole.ADMIN.toString())) {
 
             try {
 
                 OrderGetDto order = orderService.getById(id);
                 OrderStatus[] orderStatuses = OrderStatus.class.getEnumConstants();
                 return new ModelAndView("edit_order")
-                        .addObject("statuses",orderStatuses)
-                        .addObject("order",order)
-                        .addObject("person",request.getSession().getAttribute("person"));
+                        .addObject("statuses", orderStatuses)
+                        .addObject("order", order)
+                        .addObject("person", person);
             } catch (NullPointerException e) {
                 session.setAttribute("error", "There is no order with such id");
                 return new ModelAndView("redirect:/mistake");
             }
-        }
-        else{
+        } else {
             session.setAttribute("error", "You cant access this feature");
             return new ModelAndView("redirect:/mistake");
         }
     }
 
     @PostMapping("/order/{id}/update")
-    public ModelAndView updateOrder(@ModelAttribute OrderUpdateDto order, HttpServletRequest request){
+    public ModelAndView updateOrder(@ModelAttribute OrderUpdateDto order, HttpServletRequest request) {
 
         HttpSession session = request.getSession();
         PersonGetDto person = (PersonGetDto) session.getAttribute("person");
@@ -219,8 +173,7 @@ public class OrderController {
 
             orderService.updateStatus(order);
             return new ModelAndView("redirect:/orderslist");
-        }
-        else {
+        } else {
             session.setAttribute("error", "You cant access this feature");
             return new ModelAndView("redirect:/mistake");
         }

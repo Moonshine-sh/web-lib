@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class PersonGetDto extends AbstractGetDto{
+public class PersonGetDto extends AbstractGetDto {
 
     private Long id;
     private String firstName;

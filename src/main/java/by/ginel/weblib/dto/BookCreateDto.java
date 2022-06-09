@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class BookCreateDto extends AbstractCreateDto{
+public class BookCreateDto extends AbstractCreateDto {
 
     private String name;
     private String author;

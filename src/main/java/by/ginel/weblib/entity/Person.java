@@ -1,6 +1,9 @@
 package by.ginel.weblib.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,10 +12,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "person")
-public class Person extends AbstractEntity{
+public class Person extends AbstractEntity {
 
     private String firstName;
     private String lastName;

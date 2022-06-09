@@ -3,17 +3,15 @@ package by.ginel.weblib.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "user_order")
-public class Order extends AbstractEntity{
+public class Order extends AbstractEntity {
 
     private String date;
     private Long price;

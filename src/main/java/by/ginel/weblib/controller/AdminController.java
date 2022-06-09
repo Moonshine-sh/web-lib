@@ -1,13 +1,10 @@
 package by.ginel.weblib.controller;
 
 
-import by.ginel.weblib.dto.OrderGetDto;
 import by.ginel.weblib.dto.PersonGetDto;
-import by.ginel.weblib.dto.PersonUpdateDto;
 import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
