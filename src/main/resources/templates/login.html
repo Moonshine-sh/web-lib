@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th = "http://www.thymeleaf.org/">
+<html lang="en" xmlns:th = "http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<title>Login</title>
 	<meta charset="UTF-8">
@@ -37,7 +37,7 @@
 					Account Login
 				</span>
 				<form class="login100-form validate-form p-b-33 p-t-5" method="post" action="/login">
-					<div th:if="${error} ne null">
+					<div th:if="${param.error} ne null" >
 						<p th:text="${error}"></p>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate = "Enter username">
@@ -46,7 +46,7 @@
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+						<input class="input100" type="password" name="password" placeholder="Password">
 						<span class="focus-input100" data-placeholder="&#xe80f;"></span>
 					</div>
 					<div style="display:flex">

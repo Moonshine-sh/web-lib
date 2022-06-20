@@ -19,13 +19,10 @@ public class CatalogController {
     private final BookService bookService;
 
     @GetMapping("/catalog")
-    public ModelAndView getCatalog(HttpServletRequest request) {
-
-        HttpSession session = request.getSession();
+    public ModelAndView getCatalog() {
         ModelAndView modelAndView = new ModelAndView();
         List<BookGetDto> books = bookService.getAll();
-        modelAndView.addObject("person", session.getAttribute("person"))
-                .addObject("books", books)
+        modelAndView.addObject("books", books)
                 .setViewName("catalog");
         return modelAndView;
     }

@@ -1,9 +1,6 @@
 package by.ginel.weblib.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,6 +22,7 @@ public class Person extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private PersonRole role;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+    @ToString.Exclude
     private List<Order> orders;
 }

@@ -22,6 +22,6 @@ public class Order extends AbstractEntity {
     @JoinColumn(name = "person_id")
     private Person person;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<OrderBook> books;
 }

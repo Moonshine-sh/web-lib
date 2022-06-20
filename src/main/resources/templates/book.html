@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th = "http://www.thymeleaf.org/">
+<html lang="en" xmlns:th = "http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title th:text="${book.getName()}"></title>
     <meta charset="UTF-8">
@@ -44,7 +44,7 @@
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getDescription()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getPrice()}"/>
-                        <form method="get" th:action="'/book/'+${book.getId()}+'/add'" th:if="${person} ne null">
+                        <form method="get" th:action="'/book/'+${book.getId()}+'/add'" sec:authorize="isAuthenticated()">
                             <div class="wrap-input100 validate-input">
                                 <input class="input100" type="text" name="quantity" placeholder="quantity">
                                 <span class="focus-input100" data-placeholder="&#xe82a;"></span>
@@ -53,7 +53,7 @@
                                 Add to cart
                             </button>
                         </form>
-                        <div style="display: flex" th:if="${person} ne null and ${person.getRole()} eq 'ADMIN'">
+                        <div style="display: flex" sec:authorize="isAuthenticated() && hasAuthority('ADMIN')">
                             <a class="login100-form-btn"  th:href="'/book/'+${book.getId()}+'/edit'">Edit</a>
                             <a class="login100-form-btn"  th:href="'/book/'+${book.getId()}+'/delete'">Delete</a>
                         </div>

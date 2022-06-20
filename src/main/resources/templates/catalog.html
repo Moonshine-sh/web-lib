@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th = "http://www.thymeleaf.org/">
+<html lang="en" xmlns:th = "http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>catalog</title>
     <meta charset="UTF-8">
@@ -33,8 +33,8 @@
 <div class="limiter">
     <div class="container-login100">
         <div class="container-login100" style="background-image: url('/img/bg-01.jpg');">
-            <div th:if="${person} ne null">
-                <a class="login100-form-btn" th:if="${person.getRole()} eq 'ADMIN'" th:href="'/book/new'">Add book</a>
+            <div sec:authorize="isAuthenticated()">
+                <a class="login100-form-btn" sec:authorize="hasAuthority('ADMIN')" th:href="'/book/new'">Add book</a>
             </div>
             <div style="display: flex;flex-wrap: wrap;">
                 <div class="login100-form validate-form p-b-33 p-t-5" th:each="book : ${books}" style="display: flex;height: 300px;width: 400px;margin: 20px">

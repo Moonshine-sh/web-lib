@@ -22,5 +22,6 @@ public class Book extends AbstractEntity {
     private Genre genre;
 
     @OneToMany(mappedBy = "book")
+    @ToString.Exclude
     private List<OrderBook> books;
 }

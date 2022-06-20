@@ -11,21 +11,12 @@ import javax.servlet.http.HttpSession;
 public class HomeController {
 
     @GetMapping("/home")
-    public ModelAndView home(HttpServletRequest request) {
-
-        HttpSession session = request.getSession();
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("person", session.getAttribute("person"))
-                .setViewName("home");
-        return modelAndView;
+    public ModelAndView home() {
+        return new ModelAndView("home");
     }
 
     @GetMapping("/logout")
-    public ModelAndView logout(HttpServletRequest request) {
-
-        request.getSession().invalidate();
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/home");
-        return modelAndView;
+    public ModelAndView logout() {
+        return new ModelAndView("redirect:/home");
     }
 }

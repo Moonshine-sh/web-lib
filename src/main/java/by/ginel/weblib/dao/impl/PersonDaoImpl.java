@@ -46,7 +46,7 @@ public class PersonDaoImpl extends AbstractDao<Person> implements PersonDao {
 
     @Override
     public Person findByLogin(String login) throws NoResultException {
-        log.info("Executing method findAllByLogin()");
+        log.info("Executing method findByLogin()");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Person> cq = cb.createQuery(Person.class);
         Root<Person> root = cq.from(Person.class);

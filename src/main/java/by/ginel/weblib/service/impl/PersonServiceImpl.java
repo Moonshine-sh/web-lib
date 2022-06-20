@@ -10,6 +10,8 @@ import by.ginel.weblib.mapper.PersonMapper;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonDao personDao;
     protected final PersonMapper personMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -114,8 +117,9 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public boolean isValidCred(String login, String password, HttpServletRequest request) {
+        log.info("Executing method isValidCred()", login, password);
         PersonGetDto person = findByLogin(login);
-        if (person != null && person.getPassword().equals(password)) {
+        if (person != null && passwordEncoder.matches(password, person.getPassword())) {
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(3600);
             session.setAttribute("person", person);
