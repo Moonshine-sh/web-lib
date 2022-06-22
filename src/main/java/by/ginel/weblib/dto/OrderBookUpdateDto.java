@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class OrderBookUpdateDto extends AbstractUpdateDto{
+public class OrderBookUpdateDto extends AbstractUpdateDto {
 
     private Long id;
     @NotEmpty(message = "Quantity name cant be NULL")

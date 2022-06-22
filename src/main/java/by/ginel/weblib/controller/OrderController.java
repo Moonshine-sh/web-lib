@@ -7,21 +7,18 @@ import by.ginel.weblib.dto.OrderUpdateDto;
 import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.CartBook;
 import by.ginel.weblib.entity.OrderStatus;
-import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.OrderService;
 import by.ginel.weblib.service.api.PersonService;
-import jdk.jfr.Percentage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,11 +29,9 @@ public class OrderController {
 
     @GetMapping("/order")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView placeOrder(HttpServletRequest request) {
+    public ModelAndView placeOrder(HttpSession session, @SessionAttribute List<CartBook> cart) {
 
-        HttpSession session = request.getSession();
-        List<CartBook> cart = (List<CartBook>) session.getAttribute("cart");
-        if (cart == null || cart.size() == 0) {
+        if (CollectionUtils.isEmpty(cart)) {
             session.setAttribute("error", "Cart is empty please go to catalog");
             return new ModelAndView("redirect:/mistake");
         }
@@ -46,11 +41,10 @@ public class OrderController {
 
     @GetMapping("/orders")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView getOrders(HttpServletRequest request) {
+    public ModelAndView getOrders(HttpSession session) {
 
-        HttpSession session = request.getSession();
         List<OrderGetDto> orders = orderService.getAllByPersonId(getUserFromContext().getId());
-        if (orders == null || orders.size() == 0) {
+        if (CollectionUtils.isEmpty(orders)) {
             session.setAttribute("error", "you dont have active orders");
             return new ModelAndView("redirect:/mistake");
         }
@@ -59,11 +53,10 @@ public class OrderController {
 
     @GetMapping("/orderslist")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView getOrdersList(HttpServletRequest request) {
+    public ModelAndView getOrdersList(HttpSession session) {
 
-        HttpSession session = request.getSession();
         List<OrderGetDto> orders = orderService.getAll();
-        if (orders == null || orders.size() == 0) {
+        if (CollectionUtils.isEmpty(orders)) {
             session.setAttribute("error", "There are no active orders");
             return new ModelAndView("redirect:/mistake");
         }
@@ -72,16 +65,15 @@ public class OrderController {
 
     @GetMapping("/order/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView detailOrder(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView detailOrder(@PathVariable Long id, HttpSession session) {
 
-        HttpSession session = request.getSession();
         List<OrderGetDto> orders = orderService.getAllByUser(getUserFromContext());
-        if (orders == null || orders.size() == 0) {
+        if (CollectionUtils.isEmpty(orders)) {
             session.setAttribute("error", "you dont have active orders");
             return new ModelAndView("redirect:/mistake");
         }
         List<BookGetDto> books = orderService.getBooksFromOrder(id, orders);
-        if (Objects.nonNull(books))
+        if (CollectionUtils.isEmpty(books))
             return new ModelAndView("order").addObject("books", books);
         else {
             session.setAttribute("error", "there is no order with such id");
@@ -92,11 +84,10 @@ public class OrderController {
 
     @GetMapping("/order/{id}/remove")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView removeOrder(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView removeOrder(@PathVariable Long id, HttpSession session) {
 
-        HttpSession session = request.getSession();
         List<OrderGetDto> orders = orderService.getAllByPersonId(getUserFromContext().getId());
-        if (orders == null || orders.size() == 0) {
+        if (CollectionUtils.isEmpty(orders)) {
             session.setAttribute("error", "you dont have active orders");
             return new ModelAndView("redirect:/mistake");
         }
@@ -108,12 +99,10 @@ public class OrderController {
         }
     }
 
-
     @GetMapping("/order/{id}/edit")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView editOrder(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView editOrder(@PathVariable Long id, HttpSession session) {
 
-        HttpSession session = request.getSession();
         try {
             OrderGetDto order = orderService.getById(id);
             OrderStatus[] orderStatuses = OrderStatus.class.getEnumConstants();

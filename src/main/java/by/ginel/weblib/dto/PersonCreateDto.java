@@ -20,6 +20,7 @@ public class PersonCreateDto extends AbstractCreateDto {
     @NotEmpty(message = "Last name cant be NULL")
     private String lastName;
     private Boolean locked;
+    private Boolean enabled;
     @ValidLogin
     private String login;
     @ValidPassword

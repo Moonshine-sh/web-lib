@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -115,12 +115,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void addBookToCart(Long id, Long quantity, HttpServletRequest request) {
-        List<CartBook> cart = (List<CartBook>) request.getSession().getAttribute("cart");
+    public void addBookToCart(Long id, Long quantity, HttpSession session) {
+        List<CartBook> cart = (List<CartBook>) session.getAttribute("cart");
         if (cart == null)
             cart = new ArrayList<>();
         cart.add(new CartBook(id, quantity));
-        request.getSession().setAttribute("cart", cart);
+        session.setAttribute("cart", cart);
     }
 
     @Override

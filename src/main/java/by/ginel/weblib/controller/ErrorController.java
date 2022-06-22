@@ -10,10 +10,7 @@ import javax.servlet.http.HttpSession;
 public class ErrorController {
 
     @GetMapping("/mistake")
-    public ModelAndView getError(HttpSession session, ModelAndView modelAndView) {
-
-        modelAndView.addObject("error", session.getAttribute("error"))
-                .setViewName("mistake");
-        return modelAndView;
+    public ModelAndView getError(HttpSession session) {
+        return new ModelAndView("mistake").addObject("error", session.getAttribute("error"));
     }
 }

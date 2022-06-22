@@ -17,6 +17,9 @@ public abstract class PersonMapper {
 
     public abstract PersonGetDto mapToPersonGetDto(Person person);
 
+    public abstract PersonUpdateDto mapToPersonUpdateDto(PersonGetDto personGetDto);
+
+
     @Mapping(target = "password", expression = "java(passwordEncoder.encode(personCreateDto.getPassword()))")
     public abstract Person mapToPerson(PersonCreateDto personCreateDto);
 

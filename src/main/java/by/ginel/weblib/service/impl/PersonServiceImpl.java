@@ -1,16 +1,17 @@
 package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.PersonDao;
+import by.ginel.weblib.dao.api.VerificationTokenDao;
 import by.ginel.weblib.dto.PersonCreateDto;
 import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.dto.PersonUpdateDto;
 import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.entity.PersonRole;
+import by.ginel.weblib.entity.VerificationToken;
 import by.ginel.weblib.mapper.PersonMapper;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class PersonServiceImpl implements PersonService {
     private final PersonDao personDao;
     protected final PersonMapper personMapper;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationTokenDao tokenDao;
 
     @Transactional
     @Override
@@ -104,6 +106,14 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
+    public void activateUser(Long id) throws NullPointerException {
+        log.info("Executing method updateEnable()");
+        Person person = personDao.getById(id);
+        person.setEnabled(true);
+    }
+
+    @Override
     public boolean isUsersEmpty() {
         List<Person> users = personDao.getAll();
         return users == null || users.size() == 0;
@@ -130,14 +140,31 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public boolean isUserValid(PersonCreateDto person) {
+    public PersonGetDto isUserValid(PersonCreateDto person) {
         PersonGetDto personFromDB = findByLogin(person.getLogin());
         if (personFromDB == null) {
             person.setLocked(false);
+            person.setEnabled(false);
             person.setRole(PersonRole.USER.toString());
-            save(person);
-            return true;
+            return save(person);
         } else
-            return false;
+            return null;
+    }
+
+    @Override
+    public PersonGetDto getUserByToken(String token){
+        Person person = tokenDao.findByToken(token).getUser();
+        return personMapper.mapToPersonGetDto(person);
+    }
+
+    @Override
+    public VerificationToken getVerificationToken(String token){
+        return tokenDao.findByToken(token);
+    }
+
+    @Override
+    public void createVerificationToken(PersonGetDto personGetDto, String token){
+        VerificationToken verificationToken = new VerificationToken(token, personDao.getById(personGetDto.getId()));
+        tokenDao.save(verificationToken);
     }
 }

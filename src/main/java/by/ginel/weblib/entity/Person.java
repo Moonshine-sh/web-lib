@@ -16,6 +16,7 @@ public class Person extends AbstractEntity {
     private String firstName;
     private String lastName;
     private Boolean locked;
+    private Boolean enabled;
     private String login;
     private String password;
     private String email;

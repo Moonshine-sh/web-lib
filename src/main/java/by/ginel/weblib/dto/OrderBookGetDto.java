@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class OrderBookGetDto extends AbstractGetDto{
+public class OrderBookGetDto extends AbstractGetDto {
 
     private Long id;
     private Long quantity;

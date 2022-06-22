@@ -5,9 +5,11 @@ import by.ginel.weblib.entity.Genre;
 
 import java.util.List;
 
-public interface BookDao extends Dao<Book>{
+public interface BookDao extends Dao<Book> {
 
     List<Book> findAllByName(String name);
+
     List<Book> findAllByAuthor(String author);
+
     List<Book> findAllByGenre(Genre genre);
 }

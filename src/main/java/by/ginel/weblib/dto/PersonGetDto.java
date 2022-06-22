@@ -14,6 +14,7 @@ public class PersonGetDto extends AbstractGetDto {
     private String lastName;
     private Boolean locked;
     private String login;
+    private Boolean enabled;
     private String password;
     private String email;
     private String role;

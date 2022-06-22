@@ -3,24 +3,15 @@ package by.ginel.weblib.controller;
 import by.ginel.weblib.dto.BookCreateDto;
 import by.ginel.weblib.dto.BookGetDto;
 import by.ginel.weblib.dto.BookUpdateDto;
-import by.ginel.weblib.dto.PersonGetDto;
-import by.ginel.weblib.entity.CartBook;
-import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.service.api.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/book")
@@ -30,7 +21,7 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("/{id}")
-    public ModelAndView getBook(HttpServletRequest request, @PathVariable Long id) {
+    public ModelAndView getBook(HttpSession session, @PathVariable Long id) {
 
         ModelAndView modelAndView = new ModelAndView();
         try {
@@ -38,7 +29,7 @@ public class BookController {
             modelAndView.addObject("book", book).setViewName("book");
             return modelAndView;
         } catch (NullPointerException ex) {
-            request.getSession().setAttribute("error", "there is no book with such id");
+            session.setAttribute("error", "there is no book with such id");
             modelAndView.setViewName("redirect:/error");
             return modelAndView;
         }
@@ -46,19 +37,18 @@ public class BookController {
 
     @GetMapping("/{id}/add")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView addBookToCart(@PathVariable Long id, @RequestParam("quantity") Long quantity, HttpServletRequest request) {
+    public ModelAndView addBookToCart(@PathVariable Long id, @RequestParam("quantity") Long quantity, HttpSession session) {
 
         ModelAndView modelAndView = new ModelAndView();
-        bookService.addBookToCart(id, quantity, request);
+        bookService.addBookToCart(id, quantity, session);
         modelAndView.setViewName("redirect:/catalog");
         return modelAndView;
     }
 
     @GetMapping("/{id}/delete")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView deleteBook(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView deleteBook(@PathVariable Long id, HttpSession session) {
 
-        HttpSession session = request.getSession();
         ModelAndView modelAndView = new ModelAndView();
         try {
             bookService.delete(id);
@@ -73,9 +63,8 @@ public class BookController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView addBook(@ModelAttribute BookCreateDto book, @RequestParam("cover") MultipartFile cover, HttpServletRequest request) {
+    public ModelAndView addBook(@ModelAttribute BookCreateDto book, @RequestParam("cover") MultipartFile cover, HttpSession session) {
 
-        HttpSession session = request.getSession();
         ModelAndView modelAndView = new ModelAndView();
         try {
             bookService.saveBookWithCover(book, cover);
@@ -92,16 +81,13 @@ public class BookController {
     @GetMapping("/new")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ModelAndView getNewBook() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("new_book");
-        return modelAndView;
+        return new ModelAndView("new_book");
     }
 
     @GetMapping("/{id}/edit")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView getEditBook(@PathVariable Long id, HttpServletRequest request) {
+    public ModelAndView getEditBook(@PathVariable Long id, HttpSession session) {
 
-        HttpSession session = request.getSession();
         ModelAndView modelAndView = new ModelAndView();
         try {
             BookGetDto book = bookService.getById(id);
@@ -116,9 +102,8 @@ public class BookController {
 
     @PostMapping("/{id}/update")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ModelAndView updateBook(@ModelAttribute BookUpdateDto book, @RequestParam("cover") MultipartFile cover, HttpServletRequest request) {
+    public ModelAndView updateBook(@ModelAttribute BookUpdateDto book, @RequestParam("cover") MultipartFile cover, HttpSession session) {
 
-        HttpSession session = request.getSession();
         ModelAndView modelAndView = new ModelAndView();
         try {
             bookService.updateBookWithCover(book, cover);

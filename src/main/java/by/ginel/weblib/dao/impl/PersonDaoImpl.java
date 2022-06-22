@@ -10,14 +10,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Repository
 public class PersonDaoImpl extends AbstractDao<Person> implements PersonDao {
 
     @Override
-    protected Class<Person> getEntityClass() { return Person.class; }
+    protected Class<Person> getEntityClass() {
+        return Person.class;
+    }
 
     @Override
     public List<Person> findAllByName(String name) {
