@@ -34,24 +34,4 @@ public class PersonDaoImpl extends AbstractDao<Person> implements PersonDao {
         );
         return entityManager.createQuery(cq).getResultList();
     }
-
-    @Override
-    public List<Person> findAllLocked() {
-        log.info("Executing method findAllLocked()");
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Person> cq = cb.createQuery(Person.class);
-        Root<Person> root = cq.from(Person.class);
-        cq.select(root).where(cb.equal(root.get("locked"), true));
-        return entityManager.createQuery(cq).getResultList();
-    }
-
-    @Override
-    public Person findByLogin(String login) throws NoResultException {
-        log.info("Executing method findByLogin()");
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Person> cq = cb.createQuery(Person.class);
-        Root<Person> root = cq.from(Person.class);
-        cq.select(root).where(cb.equal(root.get("login"), login));
-        return entityManager.createQuery(cq).getSingleResult();
-    }
 }

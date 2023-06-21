@@ -1,7 +1,6 @@
 package by.ginel.weblib.dao.impl;
 
 import by.ginel.weblib.dao.api.VerificationTokenDao;
-import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.entity.VerificationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

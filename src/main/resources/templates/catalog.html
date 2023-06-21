@@ -44,7 +44,9 @@
                     <div>
                         <h3 class="container-login100-form-btn m-t-32" th:text="${book.getName()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getAuthor()}"/>
-                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre()}"/>
+                        <div th:each="genre : ${book.getGenre()}">
+                            <p class="container-login100-form-btn m-t-32" th:text="${genre}"/>
+                        </div>
                         <a class="login100-form-btn" th:href="'/book/'+${book.getId()}">Details</a>
                     </div>
                 </div>

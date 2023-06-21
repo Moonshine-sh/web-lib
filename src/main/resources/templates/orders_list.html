@@ -36,13 +36,13 @@
             <div style="display: flex;flex-wrap: wrap;">
                 <div class="login100-form validate-form p-b-33 p-t-5" th:each="order : ${orders}" style="height: 300px;width: 400px;margin: 20px">
                     <div>
-                        <h3 class="container-login100-form-btn m-t-32" th:text="'order #'+${order.getId()}"/>
-                        <p class="container-login100-form-btn m-t-32" th:text="${order.getStatus()}"/>
+                        <h3 class="container-login100-form-btn m-t-32" th:text="'orders #'+${order.getId()}"/>
+                        <p class="container-login100-form-btn m-t-32" th:text="${order.getStatus().get(0)}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="'expiration fee:'+${order.getPrice()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${order.getDate()}"/>
                         <div style="display: flex">
                             <a class="login100-form-btn" th:href="'/order/'+${order.getId()}">Details</a>
-                            <a class="login100-form-btn" th:if="${order.getStatus()}" th:href="'/order/'+${order.getId()}+'/edit'">Edit</a>
+                            <a class="login100-form-btn" th:if="${order.getStatus().get(0)}" th:href="'/order/'+${order.getId()}+'/edit'">Edit</a>
                         </div>
                     </div>
                 </div>

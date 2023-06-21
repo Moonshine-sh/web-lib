@@ -1,7 +1,9 @@
 package by.ginel.weblib.controller;
 
 
+import by.ginel.weblib.dto.LockUserDto;
 import by.ginel.weblib.dto.PersonGetDto;
+import by.ginel.weblib.service.api.PersonCredService;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,6 +24,7 @@ public class AdminController {
 
 
     private final PersonService personService;
+    private final PersonCredService personCredService;
 
     @GetMapping("/users")
     public ModelAndView getUserList(HttpSession session) {
@@ -30,7 +34,10 @@ public class AdminController {
             session.setAttribute("error", "you dont have active users");
             modelAndView.setViewName("redirect:/mistake");
         } else {
-            List<PersonGetDto> users = personService.getAll();
+
+            //List<PersonGetDto> users = personService.getAll();
+            List<LockUserDto> users = personService.getAllLockUsers();
+
             modelAndView.addObject("users", users).setViewName("users");
         }
         return modelAndView;
@@ -45,7 +52,7 @@ public class AdminController {
                 session.setAttribute("error", "User is admin");
                 modelAndView.setViewName("redirect:/mistake");
             } else {
-                personService.updateLocked(id);
+                personCredService.updateLocked(id);
                 modelAndView.setViewName("redirect:/users");
             }
             return modelAndView;

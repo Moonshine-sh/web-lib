@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th = "http://www.thymeleaf.org/">
 <head>
-    <title>order</title>
+    <title>orders</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->
@@ -42,7 +42,7 @@
                     <div>
                         <h3 class="container-login100-form-btn m-t-32" th:text="${book.getName()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getAuthor()}"/>
-                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre()}"/>
+                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre().get(0)}"/>
                         <div>
                             <a class="login100-form-btn" th:href="'/book/'+${book.getId()}">Details</a>
                         </div>

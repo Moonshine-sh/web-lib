@@ -22,7 +22,7 @@ public abstract class OrderBookMapper {
 
     @Mappings({
             @Mapping(target = "bookId", expression = "java(orderBook.getBook().getId())"),
-            @Mapping(target = "orderId", expression = "java(orderBook.getOrder().getId())")
+            @Mapping(target = "orderId", expression = "java(orderBook.getOrders().getId())")
     })
     public abstract OrderBookGetDto mapToOrderBookGetDto(OrderBook orderBook);
 
@@ -30,13 +30,13 @@ public abstract class OrderBookMapper {
 
     @Mappings({
             @Mapping(target = "book", expression = "java(bookDao.getById(orderBookCreateDto.getBookId()))"),
-            @Mapping(target = "order", expression = "java(orderDao.getById(orderBookCreateDto.getOrderId()))")
+            @Mapping(target = "orders", expression = "java(orderDao.getById(orderBookCreateDto.getOrderId()))")
     })
     public abstract OrderBook mapToOrderBook(OrderBookCreateDto orderBookCreateDto);
 
     @Mappings({
             @Mapping(target = "book", expression = "java(bookDao.getById(orderBookUpdateDto.getBookId()))"),
-            @Mapping(target = "order", expression = "java(orderDao.getById(orderBookUpdateDto.getOrderId()))")
+            @Mapping(target = "orders", expression = "java(orderDao.getById(orderBookUpdateDto.getOrderId()))")
     })
     public abstract OrderBook mapToOrderBook(OrderBookUpdateDto orderBookUpdateDto);
 }

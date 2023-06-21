@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -20,18 +21,9 @@ public class PersonUpdateDto extends AbstractUpdateDto {
     private String firstName;
     @NotEmpty(message = "Last name cant be NULL")
     private String lastName;
-    private Boolean locked;
-    private Boolean enabled;
-    @ValidLogin
-    private String login;
-    @ValidPassword
-    private String password;
     @NotEmpty(message = "Email cant be NULL")
     @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "Email should be valid")
     private String email;
-    private String role;
-
-    public PersonRole getRole() {
-        return PersonRole.valueOf(role);
-    }
+    private List<String> role;
+    private String mobNum;
 }

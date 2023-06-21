@@ -1,8 +1,6 @@
 package by.ginel.weblib.service.impl;
 
-import by.ginel.weblib.dao.api.BookDao;
 import by.ginel.weblib.dao.api.OrderBookDao;
-import by.ginel.weblib.dao.api.OrderDao;
 import by.ginel.weblib.dto.OrderBookCreateDto;
 import by.ginel.weblib.dto.OrderBookGetDto;
 import by.ginel.weblib.dto.OrderBookUpdateDto;
@@ -24,8 +22,6 @@ public class OrderBookServiceImpl implements OrderBookService {
 
     private final OrderBookDao orderBookDao;
     protected final OrderBookMapper orderBookMapper;
-    private final OrderDao orderDao;
-    private final BookDao bookDao;
 
     @Transactional
     @Override
@@ -67,7 +63,7 @@ public class OrderBookServiceImpl implements OrderBookService {
         List<OrderBook> orderBooks = orderBookDao.getAll();
         return orderBooks
                 .stream()
-                .filter(orderBook -> orderBook.getOrder().getId().equals(id))
+                .filter(orderBook -> orderBook.getOrders().getId().equals(id))
                 .map(orderBookMapper::mapToOrderBookGetDto)
                 .collect(Collectors.toList());
     }

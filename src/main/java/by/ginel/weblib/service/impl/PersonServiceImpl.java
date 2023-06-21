@@ -1,11 +1,15 @@
 package by.ginel.weblib.service.impl;
 
+import by.ginel.weblib.dao.api.PersonCredDao;
 import by.ginel.weblib.dao.api.PersonDao;
+import by.ginel.weblib.dao.api.PersonRoleDao;
 import by.ginel.weblib.dao.api.VerificationTokenDao;
+import by.ginel.weblib.dto.LockUserDto;
 import by.ginel.weblib.dto.PersonCreateDto;
 import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.dto.PersonUpdateDto;
 import by.ginel.weblib.entity.Person;
+import by.ginel.weblib.entity.PersonCred;
 import by.ginel.weblib.entity.PersonRole;
 import by.ginel.weblib.entity.VerificationToken;
 import by.ginel.weblib.mapper.PersonMapper;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +34,8 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonDao personDao;
     protected final PersonMapper personMapper;
-    private final PasswordEncoder passwordEncoder;
     private final VerificationTokenDao tokenDao;
+    private final PersonRoleDao personRoleDao;
 
     @Transactional
     @Override
@@ -77,43 +82,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<PersonGetDto> findAllLocked() {
-        log.info("Executing method findAllLocked()");
-        List<Person> people = personDao.findAllLocked();
-        return people
-                .stream()
-                .map(personMapper::mapToPersonGetDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public PersonGetDto findByLogin(String login) {
-        log.info("Executing method findByLogin()");
-        try {
-            Person person = personDao.findByLogin(login);
-            return personMapper.mapToPersonGetDto(person);
-        } catch (NoResultException ex) {
-            return null;
-        }
-    }
-
-    @Override
-    @Transactional
-    public void updateLocked(Long id) throws NullPointerException {
-        log.info("Executing method updateLocked()");
-        Person person = personDao.getById(id);
-        person.setLocked(!person.getLocked());
-    }
-
-    @Override
-    @Transactional
-    public void activateUser(Long id) throws NullPointerException {
-        log.info("Executing method updateEnable()");
-        Person person = personDao.getById(id);
-        person.setEnabled(true);
-    }
-
-    @Override
     public boolean isUsersEmpty() {
         List<Person> users = personDao.getAll();
         return users == null || users.size() == 0;
@@ -122,49 +90,41 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public boolean isAdmin(Long id) {
         Person user = personDao.getById(id);
-        return user.getRole() == PersonRole.ADMIN;
+        return user.getRole().contains(personRoleDao.findByName("ADMIN"));
     }
 
     @Override
-    public boolean isValidCred(String login, String password, HttpServletRequest request) {
-        log.info("Executing method isValidCred()", login, password);
-        PersonGetDto person = findByLogin(login);
-        if (person != null && passwordEncoder.matches(password, person.getPassword())) {
-            HttpSession session = request.getSession();
-            session.setMaxInactiveInterval(3600);
-            session.setAttribute("person", person);
-            return true;
-        } else
-            return false;
-
-    }
-
-    @Override
-    public PersonGetDto isUserValid(PersonCreateDto person) {
-        PersonGetDto personFromDB = findByLogin(person.getLogin());
-        if (personFromDB == null) {
-            person.setLocked(false);
-            person.setEnabled(false);
-            person.setRole(PersonRole.USER.toString());
-            return save(person);
-        } else
-            return null;
-    }
-
-    @Override
-    public PersonGetDto getUserByToken(String token){
+    public PersonGetDto getUserByToken(String token) {
         Person person = tokenDao.findByToken(token).getUser();
         return personMapper.mapToPersonGetDto(person);
     }
 
     @Override
-    public VerificationToken getVerificationToken(String token){
+    public VerificationToken getVerificationToken(String token) {
         return tokenDao.findByToken(token);
     }
 
     @Override
-    public void createVerificationToken(PersonGetDto personGetDto, String token){
+    public void createVerificationToken(PersonGetDto personGetDto, String token) {
         VerificationToken verificationToken = new VerificationToken(token, personDao.getById(personGetDto.getId()));
         tokenDao.save(verificationToken);
+    }
+
+    @Override
+    public List<LockUserDto> getAllLockUsers(){
+        List<LockUserDto> lockUsers = new ArrayList<>();
+        List<Person> users = personDao.getAll();
+        for (Person user : users) {
+            LockUserDto lockUserDto = LockUserDto.builder()
+                                           .id(user.getId())
+                                           .firstName(user.getFirstName())
+                                           .lastName(user.getLastName())
+                                           .email(user.getEmail())
+                                           .mobNum(user.getMobNum())
+                                           .locked(user.getCredentials().getLocked())
+                                           .build();
+            lockUsers.add(lockUserDto);
+        }
+        return lockUsers;
     }
 }

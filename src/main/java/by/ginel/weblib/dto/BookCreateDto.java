@@ -1,12 +1,12 @@
 package by.ginel.weblib.dto;
 
-import by.ginel.weblib.entity.Genre;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -23,9 +23,5 @@ public class BookCreateDto extends AbstractCreateDto {
     private Double price;
     private String picPath;
     @NotBlank(message = "Genre cant be NULL")
-    private String genre;
-
-    public Genre getGenre() {
-        return Genre.valueOf(genre);
-    }
+    private List<String> genre;
 }

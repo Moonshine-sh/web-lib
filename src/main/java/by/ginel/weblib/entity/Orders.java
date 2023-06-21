@@ -13,18 +13,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_order")
-public class Order extends AbstractEntity {
+@Table(name = "orders")
+public class Orders extends AbstractEntity {
 
     private String date;
     private Long price;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+
+    @ManyToMany
+    @JoinTable(name = "order_status", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "status_id"))
+    private List<Status> status;
 
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<OrderBook> books;
 }

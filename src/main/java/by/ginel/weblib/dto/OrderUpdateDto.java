@@ -1,9 +1,10 @@
 package by.ginel.weblib.dto;
 
-import by.ginel.weblib.entity.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -14,9 +15,5 @@ public class OrderUpdateDto extends AbstractUpdateDto {
     private String date;
     private Long price;
     private Long personId;
-    private String status;
-
-    public OrderStatus getStatus() {
-        return OrderStatus.valueOf(status);
-    }
+    private List<String> status;
 }

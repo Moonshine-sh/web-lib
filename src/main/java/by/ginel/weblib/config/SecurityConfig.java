@@ -1,5 +1,6 @@
 package by.ginel.weblib.config;
 
+import by.ginel.weblib.handler.CustomSuccessHandler;
 import by.ginel.weblib.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -48,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/catalog")
+                .successHandler(authenticationSuccessHandler())
                 .permitAll()
                 .failureUrl("/login?error=true")
                 .and()
@@ -73,11 +77,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler(){
+        return new CustomSuccessHandler(redirectStrategy());
+    }
 
-//    @Bean
-//    public SpringTemplateEngine templateEngine() {
-//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-//        templateEngine.addDialect(new SpringSecurityDialect());
-//        return templateEngine;
-//    }
+    @Bean
+    public RedirectStrategy redirectStrategy(){
+        return new DefaultRedirectStrategy();
+    }
 }

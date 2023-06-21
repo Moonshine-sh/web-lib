@@ -1,10 +1,15 @@
 package by.ginel.weblib.controller;
 
 import by.ginel.weblib.dto.BookGetDto;
+import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.CartBook;
+import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.service.api.BookService;
+import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +28,7 @@ public class PersonController {
 
     @GetMapping("/cart")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView getCart(HttpSession session, @SessionAttribute List<CartBook> cart) {
+    public ModelAndView getCart(HttpSession session, @SessionAttribute(required = false) List<CartBook> cart) {
 
         ModelAndView modelAndView = new ModelAndView();
         if (CollectionUtils.isEmpty(cart)) {

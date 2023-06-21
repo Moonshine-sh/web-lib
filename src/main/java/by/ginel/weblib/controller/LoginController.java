@@ -1,11 +1,13 @@
 package by.ginel.weblib.controller;
 
 import by.ginel.weblib.dto.PersonCreateDto;
+import by.ginel.weblib.dto.PersonCredCreateDto;
 import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.entity.VerificationToken;
 import by.ginel.weblib.event.OnRegistrationCompleteEvent;
 import by.ginel.weblib.mapper.PersonMapper;
+import by.ginel.weblib.service.api.PersonCredService;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,6 +26,7 @@ public class LoginController {
     private final PersonService personService;
     private final PersonMapper personMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final PersonCredService personCredService;
 
     @GetMapping("/login")
     public ModelAndView getLogin() {
@@ -36,9 +39,9 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public ModelAndView postRegister(@ModelAttribute PersonCreateDto person, HttpServletRequest request) {
+    public ModelAndView postRegister(@ModelAttribute PersonCreateDto person, @ModelAttribute PersonCredCreateDto personCred, HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
-        PersonGetDto user = personService.isUserValid(person);
+        PersonGetDto user = personCredService.isUserValid(person, personCred);
         if (Objects.nonNull(user)){
             String appUrl = request.getContextPath();
             eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, request.getLocale(), appUrl));
@@ -69,8 +72,8 @@ public class LoginController {
             modelAndView.setViewName("redirect:/login");
             return modelAndView;
         }
-        person.setEnabled(true);
-        personService.activateUser(person.getId());
+        person.getCredentials().setEnabled(true);
+        personCredService.activateUser(person.getId());
         modelAndView.setViewName("redirect:/login");
         return modelAndView;
     }

@@ -1,7 +1,7 @@
 package by.ginel.weblib.service;
 
 import by.ginel.weblib.dao.api.OrderDao;
-import by.ginel.weblib.dto.OrderUpdateDto;
+import by.ginel.weblib.dao.api.StatusDao;
 import by.ginel.weblib.entity.*;
 import by.ginel.weblib.service.api.OrderService;
 import org.junit.Test;
@@ -19,10 +19,12 @@ import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class OrderServiceTest {
+public class OrdersServiceTest {
 
     @Autowired
     OrderService orderService;
+    @Autowired
+    StatusDao statusDao;
 
     @MockBean
     OrderDao orderDao;
@@ -30,10 +32,10 @@ public class OrderServiceTest {
     @Test
     public void getAllByPersonIdTest(){
 
-        Order order1 = new Order();
-        Order order2 = new Order();
-        Order order3 = new Order();
-        Order order4 = new Order();
+        Orders orders1 = new Orders();
+        Orders orders2 = new Orders();
+        Orders orders3 = new Orders();
+        Orders orders4 = new Orders();
 
         Person person1 = new Person();
         Person person2 = new Person();
@@ -41,16 +43,16 @@ public class OrderServiceTest {
         person1.setId(1L);
         person2.setId(2L);
 
-        order1.setPerson(person1);
-        order1.setOrderStatus(OrderStatus.BOOKED);
-        order2.setPerson(person1);
-        order2.setOrderStatus(OrderStatus.BOOKED);
-        order3.setPerson(person2);
-        order3.setOrderStatus(OrderStatus.BOOKED);
-        order4.setPerson(person1);
-        order4.setOrderStatus(OrderStatus.BOOKED);
+        orders1.setPerson(person1);
+        orders1.setStatus(List.of(statusDao.findByName("BOOKED")));
+        orders2.setPerson(person1);
+        orders2.setStatus(List.of(statusDao.findByName("BOOKED")));
+        orders3.setPerson(person2);
+        orders3.setStatus(List.of(statusDao.findByName("BOOKED")));
+        orders4.setPerson(person1);
+        orders4.setStatus(List.of(statusDao.findByName("BOOKED")));
 
-        List<Order> orders = new ArrayList<>(Arrays.asList(order1,order2,order3,order4));
+        List<Orders> orders = new ArrayList<>(Arrays.asList(orders1, orders2, orders3, orders4));
 
         Mockito.when(orderDao.getAll()).thenReturn(orders);
 

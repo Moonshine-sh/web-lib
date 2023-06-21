@@ -1,13 +1,15 @@
 package by.ginel.weblib.controller;
 
 
+import by.ginel.weblib.dao.api.StatusDao;
 import by.ginel.weblib.dto.BookGetDto;
 import by.ginel.weblib.dto.OrderGetDto;
 import by.ginel.weblib.dto.OrderUpdateDto;
 import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.CartBook;
-import by.ginel.weblib.entity.OrderStatus;
+import by.ginel.weblib.entity.Status;
 import by.ginel.weblib.service.api.OrderService;
+import by.ginel.weblib.service.api.PersonCredService;
 import by.ginel.weblib.service.api.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,8 @@ public class OrderController {
 
     private final OrderService orderService;
     private final PersonService personService;
+    private final PersonCredService personCredService;
+    private final StatusDao statusDao;
 
     @GetMapping("/order")
     @PreAuthorize("isAuthenticated()")
@@ -73,7 +78,7 @@ public class OrderController {
             return new ModelAndView("redirect:/mistake");
         }
         List<BookGetDto> books = orderService.getBooksFromOrder(id, orders);
-        if (CollectionUtils.isEmpty(books))
+        if (!CollectionUtils.isEmpty(books))
             return new ModelAndView("order").addObject("books", books);
         else {
             session.setAttribute("error", "there is no order with such id");
@@ -105,9 +110,9 @@ public class OrderController {
 
         try {
             OrderGetDto order = orderService.getById(id);
-            OrderStatus[] orderStatuses = OrderStatus.class.getEnumConstants();
+            List<Status> statuses = statusDao.getAll();
             return new ModelAndView("edit_order")
-                    .addObject("statuses", orderStatuses)
+                    .addObject("statuses", statuses)
                     .addObject("order", order);
         } catch (NullPointerException e) {
             session.setAttribute("error", "There is no order with such id");
@@ -125,6 +130,6 @@ public class OrderController {
 
     private PersonGetDto getUserFromContext() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return personService.findByLogin(user.getUsername());
+        return personService.getById(personCredService.findByLogin(user.getUsername()).getPersonId());
     }
 }

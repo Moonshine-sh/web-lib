@@ -1,11 +1,14 @@
 package by.ginel.weblib.service.impl;
 
 import by.ginel.weblib.dao.api.OrderDao;
+import by.ginel.weblib.dao.api.PersonRoleDao;
+import by.ginel.weblib.dao.api.StatusDao;
 import by.ginel.weblib.dto.*;
+import by.ginel.weblib.entity.Book;
 import by.ginel.weblib.entity.CartBook;
-import by.ginel.weblib.entity.Order;
-import by.ginel.weblib.entity.OrderStatus;
-import by.ginel.weblib.entity.PersonRole;
+import by.ginel.weblib.entity.OrderBook;
+import by.ginel.weblib.entity.Orders;
+import by.ginel.weblib.mapper.BookMapper;
 import by.ginel.weblib.mapper.OrderBookMapper;
 import by.ginel.weblib.mapper.OrderMapper;
 import by.ginel.weblib.service.api.BookService;
@@ -32,12 +35,15 @@ public class OrderServiceImpl implements OrderService {
     private final OrderBookService orderBookService;
     protected final OrderBookMapper orderBookMapper;
     private final BookService bookService;
+    private final StatusDao statusDao;
+    private final PersonRoleDao roleDao;
+    private final BookMapper bookMapper;
 
     @Transactional
     @Override
     public OrderGetDto save(OrderCreateDto orderCreateDto) {
-        Order order = orderDao.save(orderMapper.mapToOrder(orderCreateDto));
-        return orderMapper.mapToOrderGetDto(order);
+        Orders orders = orderDao.save(orderMapper.mapToOrder(orderCreateDto));
+        return orderMapper.mapToOrderGetDto(orders);
     }
 
     @Transactional
@@ -54,13 +60,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderGetDto getById(Long id) throws NullPointerException {
-        Order order = orderDao.getById(id);
-        return orderMapper.mapToOrderGetDto(order);
+        Orders orders = orderDao.getById(id);
+        return orderMapper.mapToOrderGetDto(orders);
     }
 
     @Override
     public List<OrderGetDto> getAll() {
-        List<Order> orders = orderDao.getAll();
+        List<Orders> orders = orderDao.getAll();
         return orders
                 .stream()
                 .map(orderMapper::mapToOrderGetDto)
@@ -70,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderGetDto> getAllByPersonId(Long id) {
         log.info("Executing method getAllByPersonId()");
-        List<Order> orders = orderDao.getAll();
+        List<Orders> orders = orderDao.getAll();
         return orders
                 .stream()
                 .filter(order -> order.getPerson().getId().equals(id))
@@ -82,8 +88,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateStatus(OrderUpdateDto newOrder) throws NullPointerException {
         log.info("Executing method updateStatus()");
-        Order order = orderDao.getById(newOrder.getId());
-        order.setOrderStatus(newOrder.getStatus());
+        Orders orders = orderDao.getById(newOrder.getId());
+        orders.setStatus(newOrder.getStatus().stream().map(statusDao::findByName).collect(Collectors.toList()));
     }
 
     @Override
@@ -102,13 +108,13 @@ public class OrderServiceImpl implements OrderService {
                 .forEach(orderBookService::save);
 
         order.setPrice(findOrderPrice(cart));
-        update(orderMapper.mapToOderUpdateDto(order));
+        update(orderMapper.mapToOrderUpdateDto(order));
     }
 
     @Override
     public List<OrderGetDto> getAllByUser(PersonGetDto person) {
         List<OrderGetDto> orders;
-        if (person.getRole().equals(PersonRole.ADMIN.toString())) {
+        if (person.getRole().contains(roleDao.findByName("ADMIN"))) {
             orders = getAll();
         } else {
             orders = getAllByPersonId(person.getId());
@@ -118,24 +124,22 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<BookGetDto> getBooksFromOrder(Long id, List<OrderGetDto> orders) {
-        OrderGetDto order = orders.stream()
+        orders.stream()
                 .filter(item -> item.getId().equals(id))
-                .findFirst().orElse(null);
+                .findFirst().orElseThrow();
 
-        List<BookGetDto> books;
-        if (Objects.nonNull(order))
-            books = orderBookService.getAllByOrderId(order.getId()).stream()
-                    .map(item -> bookService.getById(item.getBookId()))
-                    .collect(Collectors.toList());
-        else
-            books = null;
+
+
+        Orders order = orderDao.getById(id);
+        List<BookGetDto> books = order.getBooks().stream().map(OrderBook::getBook).map(bookMapper::mapToBookGetDto).collect(Collectors.toList());
+
         return books;
     }
 
     @Override
     public boolean removeOrder(Long id, List<OrderGetDto> orders) {
         Optional<OrderGetDto> orderGetDto = orders.stream()
-                .filter(order -> order.getId().equals(id) && order.getStatus().equals("BOOKED"))
+                .filter(order -> order.getId().equals(id) && order.getStatus().contains(statusDao.findByName("BOOKED").getName()))
                 .findFirst();
         if (orderGetDto.isPresent()) {
             delete(orderGetDto.get().getId());
@@ -155,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
         OrderCreateDto order = OrderCreateDto.builder()
                 .personId(person.getId())
                 .date(new Date().toString())
-                .status(OrderStatus.BOOKED.toString())
+                .status(List.of(statusDao.findByName("BOOKED").getName()))
                 .build();
         return save(order);
     }

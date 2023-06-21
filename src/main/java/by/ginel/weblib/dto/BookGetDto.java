@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
@@ -15,5 +17,5 @@ public class BookGetDto extends AbstractGetDto {
     private String description;
     private Double price;
     private String picPath;
-    private String genre;
+    private List<String> genre;
 }

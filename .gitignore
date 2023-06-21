@@ -33,5 +33,6 @@ packages/
 
 /.idea/*
 /target/*
+/uploads/*
 *.iml
 *.log

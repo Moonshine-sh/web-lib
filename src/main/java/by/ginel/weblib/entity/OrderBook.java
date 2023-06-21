@@ -23,5 +23,5 @@ public class OrderBook extends AbstractEntity {
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "order_id")
-    private Order order;
+    private Orders orders;
 }
