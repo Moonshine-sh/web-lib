@@ -2,8 +2,8 @@ package by.ginel.weblib.service;
 
 import by.ginel.weblib.dao.api.OrderBookDao;
 import by.ginel.weblib.entity.Book;
-import by.ginel.weblib.entity.Order;
 import by.ginel.weblib.entity.OrderBook;
+import by.ginel.weblib.entity.Orders;
 import by.ginel.weblib.service.api.OrderBookService;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class OrderBookServiceTest {
+public class OrdersBookServiceTest {
 
     @Autowired
     OrderBookService orderBookService;
@@ -36,19 +36,19 @@ public class OrderBookServiceTest {
         OrderBook orderBook3 = new OrderBook();
         OrderBook orderBook4 = new OrderBook();
 
-        Order order1 = new Order();
-        Order order2 = new Order();
+        Orders orders1 = new Orders();
+        Orders orders2 = new Orders();
 
-        order1.setId(1L);
-        order2.setId(2L);
+        orders1.setId(1L);
+        orders2.setId(2L);
 
-        orderBook1.setOrder(order1);
+        orderBook1.setOrders(orders1);
         orderBook1.setBook(new Book());
-        orderBook2.setOrder(order1);
+        orderBook2.setOrders(orders1);
         orderBook2.setBook(new Book());
-        orderBook3.setOrder(order2);
+        orderBook3.setOrders(orders2);
         orderBook3.setBook(new Book());
-        orderBook4.setOrder(order1);
+        orderBook4.setOrders(orders1);
         orderBook4.setBook(new Book());
 
         List<OrderBook> orderBooks = new ArrayList<>(Arrays.asList(orderBook1,orderBook2,orderBook3,orderBook4));

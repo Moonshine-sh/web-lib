@@ -1,17 +1,14 @@
 package by.ginel.weblib.service.impl;
 
-import by.ginel.weblib.dao.api.BookDao;
 import by.ginel.weblib.dao.api.OrderBookDao;
-import by.ginel.weblib.dao.api.OrderDao;
-import by.ginel.weblib.dto.OrderGetDto;
-import by.ginel.weblib.entity.Order;
-import by.ginel.weblib.entity.OrderBook;
-import by.ginel.weblib.service.api.OrderBookService;
 import by.ginel.weblib.dto.OrderBookCreateDto;
 import by.ginel.weblib.dto.OrderBookGetDto;
 import by.ginel.weblib.dto.OrderBookUpdateDto;
+import by.ginel.weblib.entity.OrderBook;
+import by.ginel.weblib.mapper.OrderBookMapper;
+import by.ginel.weblib.service.api.OrderBookService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,61 +17,35 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OrderBookServiceImpl implements OrderBookService {
 
-    @Autowired
-    OrderBookDao orderBookDao;
-
-    @Autowired
-    OrderDao orderDao;
-
-    @Autowired
-    BookDao bookDao;
+    private final OrderBookDao orderBookDao;
+    protected final OrderBookMapper orderBookMapper;
 
     @Transactional
     @Override
     public OrderBookGetDto save(OrderBookCreateDto orderBookCreateDto) {
-        OrderBook orderBook = orderBookDao.save(
-                OrderBook.builder()
-                        .quantity(orderBookCreateDto.getQuantity())
-                        .book(bookDao.getById(orderBookCreateDto.getBookId()))
-                        .order(orderDao.getById(orderBookCreateDto.getOrderId()))
-                        .build()
-        );
-        return OrderBookGetDto.builder()
-                .id(orderBook.getId())
-                .quantity(orderBook.getQuantity())
-                .bookId(orderBook.getBook().getId())
-                .orderId(orderBook.getOrder().getId())
-                .build();
+        OrderBook orderBook = orderBookDao.save(orderBookMapper.mapToOrderBook(orderBookCreateDto));
+        return orderBookMapper.mapToOrderBookGetDto(orderBook);
     }
 
     @Transactional
     @Override
-    public void delete(Long id) { orderBookDao.delete(id);
+    public void delete(Long id) {
+        orderBookDao.delete(id);
     }
 
     @Transactional
     @Override
     public void update(OrderBookUpdateDto orderBookUpdateDto) {
-        OrderBook orderBook = new OrderBook();
-        orderBook.setId(orderBookUpdateDto.getId());
-        orderBook.setQuantity(orderBookUpdateDto.getQuantity());
-        orderBook.setBook(bookDao.getById(orderBookUpdateDto.getBookId()));
-        orderBook.setOrder(orderDao.getById(orderBookUpdateDto.getOrderId()));
-
-        orderBookDao.update(orderBook);
+        orderBookDao.update(orderBookMapper.mapToOrderBook(orderBookUpdateDto));
     }
 
     @Override
     public OrderBookGetDto getById(Long id) {
         OrderBook orderBook = orderBookDao.getById(id);
-        return  OrderBookGetDto.builder()
-                .id(orderBook.getId())
-                .quantity(orderBook.getQuantity())
-                .bookId(orderBook.getBook().getId())
-                .orderId(orderBook.getOrder().getId())
-                .build();
+        return orderBookMapper.mapToOrderBookGetDto(orderBook);
     }
 
     @Override
@@ -82,13 +53,7 @@ public class OrderBookServiceImpl implements OrderBookService {
         List<OrderBook> orderBooks = orderBookDao.getAll();
         return orderBooks
                 .stream()
-                .map(orderBook ->OrderBookGetDto.builder()
-                        .id(orderBook.getId())
-                        .quantity(orderBook.getQuantity())
-                        .bookId(orderBook.getBook().getId())
-                        .orderId(orderBook.getOrder().getId())
-                        .build()
-                )
+                .map(orderBookMapper::mapToOrderBookGetDto)
                 .collect(Collectors.toList());
     }
 
@@ -98,14 +63,8 @@ public class OrderBookServiceImpl implements OrderBookService {
         List<OrderBook> orderBooks = orderBookDao.getAll();
         return orderBooks
                 .stream()
-                .filter(orderBook -> orderBook.getOrder().getId() == id)
-                .map(orderBook ->OrderBookGetDto.builder()
-                        .id(orderBook.getId())
-                        .quantity(orderBook.getQuantity())
-                        .bookId(orderBook.getBook().getId())
-                        .orderId(orderBook.getOrder().getId())
-                        .build()
-                )
+                .filter(orderBook -> orderBook.getOrders().getId().equals(id))
+                .map(orderBookMapper::mapToOrderBookGetDto)
                 .collect(Collectors.toList());
     }
 }

@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrderBookDaoImpl extends AbstractDao<OrderBook> implements OrderBookDao {
     @Override
-    protected Class<OrderBook> getEntityClass() { return OrderBook.class; }
+    protected Class<OrderBook> getEntityClass() {
+        return OrderBook.class;
+    }
 }

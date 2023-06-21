@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th = "http://www.thymeleaf.org/">
+<html lang="en" xmlns:th = "http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
     <div th:fragment="header" style="display: flex; justify-content: space-between;">
-        <div style="text-align: left" th:if="${person} ne null">
+        <div style="text-align: left" sec:authorize="isAuthenticated()">
             <div>
                 <a th:href="@{/catalog}">Open catalog</a>
                 <br>
@@ -16,15 +16,17 @@
             </div>
         </div>
         <div style="text-align: right" >
-            <div th:if="${person} ne null">
-                <p th:text="'hello, '+${person.getFirstName()}"></p>
+            <div sec:authorize="isAuthenticated()">
+                <p th:text="'hello, '+ ${#authentication.name}"></p>
+                <a th:href="@{/userProfile}">my account</a>
+                <br>
                 <a th:href="@{/logout}">logout</a>
                 <br>
-                <a th:href="@{/users}" th:if="${person.getRole()} eq 'ADMIN'">Users list</a>
+                <a th:href="@{/users}" sec:authorize="hasAuthority('ADMIN')">Users list</a>
                 <br>
-                <a th:href="@{/orderslist}" th:if="${person.getRole()} eq 'ADMIN'">Orders list</a>
+                <a th:href="@{/orderslist}" sec:authorize="hasAuthority('ADMIN')">Orders list</a>
             </div>
-            <div th:unless="${person} ne null">
+            <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}">login</a>
             </div>
         </div>

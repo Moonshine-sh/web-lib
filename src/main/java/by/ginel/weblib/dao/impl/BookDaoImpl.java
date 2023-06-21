@@ -20,7 +20,9 @@ public class BookDaoImpl extends AbstractDao<Book> implements BookDao {
     }
 
     @Override
-    protected Class<Book> getEntityClass() { return Book.class; }
+    protected Class<Book> getEntityClass() {
+        return Book.class;
+    }
 
     @Override
     public List<Book> findAllByName(String name) {
@@ -30,7 +32,7 @@ public class BookDaoImpl extends AbstractDao<Book> implements BookDao {
         Root<Book> root = cq.from(Book.class);
         cq.select(root).where(
                 cb.or(
-                        cb.like(root.get("name"),getCriteriaLikeValue(name)),
+                        cb.like(root.get("name"), getCriteriaLikeValue(name)),
                         cb.like(root.get("author"), getCriteriaLikeValue(name))
                 )
         );

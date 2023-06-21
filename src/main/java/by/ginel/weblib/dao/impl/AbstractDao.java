@@ -26,7 +26,7 @@ public abstract class AbstractDao<T extends AbstractEntity> implements Dao<T> {
     @Override
     public T save(T entity) {
         log.info("Executing method save()");
-        log.debug("Executing method save() for the entity: {}" ,entity);
+        log.debug("Executing method save() for the entity: {}", entity);
         entityManager.persist(entity);
         return entity;
     }
@@ -36,7 +36,7 @@ public abstract class AbstractDao<T extends AbstractEntity> implements Dao<T> {
     public void delete(Long id) {
         log.info("Executing method delete()");
         log.debug("Executing method delete() for the entity with id: {}", id);
-        entityManager.remove(entityManager.find(getEntityClass(),id));
+        entityManager.remove(entityManager.find(getEntityClass(), id));
     }
 
     @Transactional

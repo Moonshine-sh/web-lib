@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th = "http://www.thymeleaf.org/">
 <head>
-    <title>order</title>
+    <title>orders</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->
@@ -32,22 +32,22 @@
 
 <div class="limiter">
     <div class="container-login100">
-        <div class="container-login100">
-            <div  >
-                <div class="login100-form validate-form p-b-33 p-t-5" style="display: flex" th:each="book : ${books}">
+        <div class="container-login100" style="background-image: url('/img/bg-01.jpg');">
+            <a class="login100-form-btn" th:href="'/orders'">back to orders</a>
+            <div style="display: flex;flex-wrap: wrap;">
+                <div class="login100-form validate-form p-b-33 p-t-5" th:each="book : ${books}" style="display: flex;height: 300px;width: 400px;margin: 20px">
                     <div>
                         <img th:src="'/img/'+${book.getPicPath()}" th:alt="'/img/bg-01.jpg'" width="140pt" height="170pt">
                     </div>
                     <div>
                         <h3 class="container-login100-form-btn m-t-32" th:text="${book.getName()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getAuthor()}"/>
-                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre()}"/>
+                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre().get(0)}"/>
                         <div>
                             <a class="login100-form-btn" th:href="'/book/'+${book.getId()}">Details</a>
                         </div>
                     </div>
                 </div>
-                <a class="login100-form-btn" th:href="'/orders'">back to orders</a>
             </div>
         </div>
     </div>

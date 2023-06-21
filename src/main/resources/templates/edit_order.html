@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th = "http://www.thymeleaf.org/">
 <head>
-    <title>Edit order</title>
+    <title>Edit orders</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->
@@ -32,14 +32,17 @@
 
 <div class="limiter">
     <div class="container-login100">
-        <div class="container-login100">
+        <div class="container-login100" style="background-image: url('/img/bg-01.jpg');">
             <div>
-                <div class="login100-form validate-form p-b-33 p-t-5" >
-                    <h3 class="container-login100-form-btn m-t-32" th:text="'order #'+${order.getId()}"/>
+                <div class="login100-form validate-form p-b-33 p-t-5" style="height: 300px;width: 400px;margin: 20px">
+                    <h3 class="container-login100-form-btn m-t-32" th:text="'orders #'+${order.getId()}"/>
                     <form method="post" th:action="'/order/'+${order.getId()}+'/update'">
 
                         <div class="wrap-input100 validate-input" data-validate = "Enter status" >
-                            <input class="input100" type="text" name="status" placeholder="Status" th:value="${order.getStatus()}">
+                            <select class="input100" name="status" th:value="${order.getStatus().get(0)}">
+                                <option th:each="status : ${statuses}" th:value="${status.getName()}" th:text="${status.getName()}">
+                                </option>
+                            </select>
                             <span class="focus-input100" data-placeholder="&#xe82a;"></span>
                         </div>
 

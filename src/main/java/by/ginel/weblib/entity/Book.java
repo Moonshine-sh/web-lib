@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "book")
 public class Book extends AbstractEntity {
@@ -19,9 +18,12 @@ public class Book extends AbstractEntity {
     private String description;
     private Double price;
     private String picPath;
-    @Enumerated(EnumType.STRING)
-    private Genre genre;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"),inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private List<Genre> genre;
 
     @OneToMany(mappedBy = "book")
+    @ToString.Exclude
     private List<OrderBook> books;
 }

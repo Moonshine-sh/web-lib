@@ -1,6 +1,9 @@
 package by.ginel.weblib.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -8,10 +11,9 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "order_book")
-public class OrderBook extends AbstractEntity{
+public class OrderBook extends AbstractEntity {
 
     private Long quantity;
 
@@ -21,5 +23,5 @@ public class OrderBook extends AbstractEntity{
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "order_id")
-    private Order order;
+    private Orders orders;
 }

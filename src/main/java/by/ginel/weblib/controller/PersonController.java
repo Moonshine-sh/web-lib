@@ -1,71 +1,69 @@
 package by.ginel.weblib.controller;
 
 import by.ginel.weblib.dto.BookGetDto;
+import by.ginel.weblib.dto.PersonGetDto;
 import by.ginel.weblib.entity.CartBook;
+import by.ginel.weblib.entity.Person;
 import by.ginel.weblib.service.api.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.ginel.weblib.service.api.PersonService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class PersonController {
 
-    @Autowired
-    BookService bookService;
+    private final BookService bookService;
 
     @GetMapping("/cart")
-    public ModelAndView getCart(HttpServletRequest request){
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView getCart(HttpSession session, @SessionAttribute(required = false) List<CartBook> cart) {
 
-        HttpSession session = request.getSession();
-        if(session.getAttribute("person") != null){
-            List<CartBook> cart = (List<CartBook>) session.getAttribute("cart");
-            if (cart == null || cart.size()==0){
-                session.setAttribute("error","Cart is empty please go to catalog");
-                return new ModelAndView("redirect:/mistake");
-            }
-            List<BookGetDto> books = cart.stream()
-                    .map(item -> bookService.getById(item.getBookId()))
-                    .collect(Collectors.toList());
-            return new ModelAndView("cart")
-                    .addObject("cart",cart).addObject("books",books)
-                    .addObject("person",session.getAttribute("person"));
+        ModelAndView modelAndView = new ModelAndView();
+        if (CollectionUtils.isEmpty(cart)) {
+            session.setAttribute("error", "Cart is empty please go to catalog");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
-        else{
-            session.setAttribute("error", "Please login before accessing this feature");
-            return new ModelAndView("redirect:/mistake");
-        }
+        List<BookGetDto> books = bookService.getBooksFromCart(cart);
+        modelAndView
+                .addObject("cart", cart)
+                .addObject("books", books)
+                .setViewName("cart");
+        return modelAndView;
+
     }
+
 
     @GetMapping("/cart/{id}")
-    public ModelAndView removeBookFromCart(@PathVariable Long id, HttpServletRequest request){
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView removeBookFromCart(@PathVariable Long id, HttpSession session, @SessionAttribute List<CartBook> cart) {
 
-        HttpSession session = request.getSession();
-        if(session.getAttribute("person") != null){
-            List<CartBook> cart = (List<CartBook>) session.getAttribute("cart");
-            if (cart == null){
-                session.setAttribute("error","Cart is empty please go to catalog");
-                return new ModelAndView("redirect:/mistake");
-            }
-            for (CartBook item:cart) {
-                if (item.getBookId()==id){
-                    cart.remove(item);
-                    return new ModelAndView("redirect:/cart");
-                }
-            }
-            session.setAttribute("error", "there is no book in cart with such id");
-            return new ModelAndView("redirect:/mistake");
+        ModelAndView modelAndView = new ModelAndView();
+        if (CollectionUtils.isEmpty(cart)) {
+            session.setAttribute("error", "Cart is empty please go to catalog");
+            modelAndView.setViewName("redirect:/mistake");
+            return modelAndView;
         }
-        else{
-            session.setAttribute("error", "Please login before accessing this feature");
-            return new ModelAndView("redirect:/mistake");
+        if (bookService.removeBookFromCart(id, cart)) {
+            modelAndView.setViewName("redirect:/cart");
+            return modelAndView;
         }
+        session.setAttribute("error", "there is no book in cart with such id");
+        modelAndView.setViewName("redirect:/mistake");
+        return modelAndView;
     }
+
+
 }

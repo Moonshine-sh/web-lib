@@ -4,17 +4,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-public class PersonGetDto extends AbstractGetDto{
+public class PersonGetDto extends AbstractGetDto {
 
     private Long id;
     private String firstName;
     private String lastName;
-    private Boolean locked;
-    private String login;
-    private String password;
     private String email;
-    private String role;
+    private List<String> role;
+    private String mobNum;
 }

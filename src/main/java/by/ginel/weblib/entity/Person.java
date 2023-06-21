@@ -9,20 +9,23 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "person")
-public class Person extends AbstractEntity{
+public class Person extends AbstractEntity {
 
     private String firstName;
     private String lastName;
-    private Boolean locked;
-    private String login;
-    private String password;
     private String email;
-    @Enumerated(EnumType.STRING)
-    private PersonRole role;
+    private String mobNum;
 
-    @OneToMany(mappedBy = "person")
-    private List<Order> orders;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "person_role", joinColumns = @JoinColumn(name = "person_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<PersonRole> role;
+
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<Orders> orders;
+
+    @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
+    private PersonCred credentials;
 }

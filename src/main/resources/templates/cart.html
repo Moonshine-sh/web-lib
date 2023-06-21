@@ -32,23 +32,25 @@
 
 <div class="limiter">
     <div class="container-login100">
-        <div class="container-login100">
-            <div  >
-                <div class="login100-form validate-form p-b-33 p-t-5" style="display: flex" th:each="book : ${books}">
+        <div class="container-login100" style="background-image: url('/img/bg-01.jpg');">
+            <div style="display: flex;flex-wrap: wrap;">
+                <a class="login100-form-btn" th:href="'/order'">Order</a>
+                <div class="login100-form validate-form p-b-33 p-t-5" th:each="book : ${books}" style="display: flex;height: 300px;width: 460px;margin: 20px">
                     <div>
                         <img th:src="'/img/'+${book.getPicPath()}" th:alt="'/img/bg-01.jpg'" width="140pt" height="170pt">
                     </div>
                     <div>
                         <h3 class="container-login100-form-btn m-t-32" th:text="${book.getName()}"/>
                         <p class="container-login100-form-btn m-t-32" th:text="${book.getAuthor()}"/>
-                        <p class="container-login100-form-btn m-t-32" th:text="${book.getGenre()}"/>
+                        <div th:each="genre : ${book.getGenre()}">
+                            <p class="container-login100-form-btn m-t-32" th:text="${genre}"/>
+                        </div>
                         <div style="display: flex">
                             <a class="login100-form-btn" th:href="'/book/'+${book.getId()}">Details</a>
                             <a class="login100-form-btn" th:href="'/cart/'+${book.getId()}">Remove</a>
                         </div>
                     </div>
                 </div>
-                <a class="login100-form-btn" th:href="'/order'">Order</a>
             </div>
         </div>
     </div>
